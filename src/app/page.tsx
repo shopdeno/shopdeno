@@ -212,7 +212,8 @@ export default function HomePage() {
       />
 
       {/* ── Section 2: Matatus Are a Way of Life ── */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <section className="bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-gray-500 mb-3">
@@ -242,6 +243,7 @@ export default function HomePage() {
             />
           </div>
         </div>
+        </div>
       </section>
 
       {/* ── Product Stripe 2 ── */}
@@ -253,7 +255,8 @@ export default function HomePage() {
       />
 
       {/* ── Section 4: About the Artist ── */}
-      <section id="about-artist" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <section id="about-artist" className="bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <div>
             <h2 className="text-3xl font-bold tracking-tight text-gray-900">About the Artist</h2>
@@ -362,6 +365,7 @@ export default function HomePage() {
               />
             </div>
           </div>
+        </div>
         </div>
       </section>
 
@@ -493,8 +497,9 @@ export default function HomePage() {
             src="/dennis-muraguri-in-his-nairobi-studio-kuona-arts-trust.webp"
             alt=""
             fill
-            className="object-cover opacity-20"
+            className="object-cover opacity-40"
           />
+          <div className="absolute inset-0 bg-black/35" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <Image
@@ -504,10 +509,10 @@ export default function HomePage() {
             height={90}
             className="mx-auto mb-6"
           />
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-white">
             Montague Contemporary<br />presents<br />Dennis Muraguri
           </h2>
-          <p className="mt-6 max-w-2xl mx-auto text-lg text-gray-600">
+          <p className="mt-6 max-w-2xl mx-auto text-lg text-gray-200">
             Discover the world that inspires Dennis Muraguri and delve into his creative process with
             a glimpse inside his Nairobi studio. Experience how he weaves together textual and visual
             elements from music, graffiti, television, and film to capture a unique contemporary urban
@@ -596,7 +601,8 @@ export default function HomePage() {
       />
 
       {/* ── Section 8: WePresent Feature ── */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <section className="bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <Image
             src="/wepresent-interview.avif"
@@ -627,6 +633,7 @@ export default function HomePage() {
               To WePresent&apos;s interview…
             </a>
           </div>
+        </div>
         </div>
       </section>
 
