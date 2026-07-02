@@ -22,10 +22,9 @@ interface HeaderProps {
 }
 
 const DEFAULT_MENU: MenuItem[] = [
-  { id: "1", name: "Shop All", url: "/products" },
+  { id: "1", name: "Shop DENO", url: "/products" },
   { id: "saccos", name: "Shop SACCO", url: "/saccos" },
-  { id: "beba", name: "Shop Beba", url: "/saccos/beba" },
-  { id: "2", name: "My Account", url: "/account" },
+  { id: "attire", name: "Shop ATTIRE", url: "/attire" },
 ];
 
 function menuHref(item: MenuItem): string {

@@ -5,7 +5,7 @@ import { ProductCard, type ProductCardProduct } from "@/components/ProductCard";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
-  title: "Shop All",
+  title: "Shop DENO",
   description: `Browse all matatu and sacco art prints from ${siteConfig.name}.`,
 };
 
@@ -29,7 +29,7 @@ export default async function ProductsPage() {
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Shop All</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Shop DENO</h1>
           <p className="mt-4 text-lg text-gray-500">
             Every matatu and sacco art print, all in one place.
           </p>
