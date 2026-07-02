@@ -18,7 +18,8 @@ export function Footer() {
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-white text-sm leading-relaxed block"
             >
-              {siteConfig.studio.name},<br />
+              Kuona Artists Collective,<br />
+              Centre for the Visual Arts,<br />
               {siteConfig.studio.address}
             </a>
             <a

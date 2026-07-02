@@ -1,0 +1,16 @@
+{
+  "name": "Store",
+  "short_name": "Store",
+  "description": "Premium E-commerce Store",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}
