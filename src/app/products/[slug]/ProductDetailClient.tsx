@@ -4,8 +4,9 @@ import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { ChevronLeft, ChevronRight, X, Check, Loader2, ShoppingCart, Heart, Truck, Clock, Share2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Check, Loader2, ShoppingCart, Heart, Truck, Clock, Share2, MapPin } from "lucide-react";
 import { ProductCard, type ProductCardProduct } from "@/components/ProductCard";
+import { productDisplayName } from "@/lib/site-config";
 
 // Client-side color name → hex fallback for DROPDOWN Color attribute
 // (Saleor DROPDOWN type stores no hex; value.value is empty)
@@ -163,6 +164,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
   const [activeTab, setActiveTab] = useState<"description" | "reviews" | "shipping" | "policy">("description");
   const [wishlisted, setWishlisted] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
+  const [linkCopied, setLinkCopied] = useState(false);
   const [hoveredThumb, setHoveredThumb] = useState<number | null>(null);
   const { addItem, isLoading } = useCart();
 
@@ -222,6 +224,21 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
     return map;
   }, [product.variants]);
 
+  const sortedProductImages = useMemo(() => {
+    const seenColors: string[] = [];
+    for (const v of product.variants) {
+      const slug = v.attributes.find(a => a.attribute.slug === "color")?.values[0]?.slug;
+      if (slug && !seenColors.includes(slug)) seenColors.push(slug);
+    }
+    if (seenColors.length === 0) return productImages;
+    const colorOrder = new Map(seenColors.map((slug, i) => [slug, i]));
+    return [...productImages].sort((a, b) => {
+      const aIdx = colorOrder.get(imageVariantAttrs.get(a.url)?.["color"] ?? "") ?? Infinity;
+      const bIdx = colorOrder.get(imageVariantAttrs.get(b.url)?.["color"] ?? "") ?? Infinity;
+      return aIdx - bIdx;
+    });
+  }, [product.variants, productImages, imageVariantAttrs]);
+
   useEffect(() => {
     if (product.variants.length > 0 && !selectedVariant) {
       const firstVariant = product.variants[0];
@@ -261,18 +278,18 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
     if (!lightboxOpen) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") setLightboxOpen(false);
-      if (e.key === "ArrowLeft") setSelectedImage((i) => (i - 1 + productImages.length) % productImages.length);
-      if (e.key === "ArrowRight") setSelectedImage((i) => (i + 1) % productImages.length);
+      if (e.key === "ArrowLeft") setSelectedImage((i) => (i - 1 + sortedProductImages.length) % sortedProductImages.length);
+      if (e.key === "ArrowRight") setSelectedImage((i) => (i + 1) % sortedProductImages.length);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [lightboxOpen, productImages.length]);
+  }, [lightboxOpen, sortedProductImages.length]);
 
   // Sync main image to selected variant's first media item
   useEffect(() => {
     if (!selectedVariant?.media?.length) return;
     const url = selectedVariant.media[0].url;
-    const idx = productImages.findIndex((img) => img.url === url);
+    const idx = sortedProductImages.findIndex((img) => img.url === url);
     if (idx !== -1) setSelectedImage(idx);
   }, [selectedVariant]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -325,17 +342,21 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
               <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">Home</Link>
             </li>
             <li><ChevronLeft className="h-4 w-4 text-gray-400" /></li>
+            <li>
+              <Link href="/products" className="text-sm text-gray-500 hover:text-gray-700">Shop DENO</Link>
+            </li>
+            <li><ChevronLeft className="h-4 w-4 text-gray-400" /></li>
             {product.category && (
               <>
                 <li>
-                  <Link href={`/collections/${product.category.slug}`} className="text-sm text-gray-500 hover:text-gray-700">
+                  <Link href={`/saccos/${product.category.slug}`} className="text-sm text-gray-500 hover:text-gray-700">
                     {product.category.name}
                   </Link>
                 </li>
                 <li><ChevronLeft className="h-4 w-4 text-gray-400" /></li>
               </>
             )}
-            <li><span className="text-sm font-medium text-gray-900">{product.name}</span></li>
+            <li><span className="text-sm font-medium text-gray-900">{productDisplayName(product.name)}</span></li>
           </ol>
         </nav>
 
@@ -344,12 +365,12 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
           <div className="lg:max-w-lg lg:self-start">
             <div
               className="rounded-xl bg-gray-100 shadow-sm cursor-zoom-in overflow-hidden"
-              onClick={() => productImages.length > 0 && setLightboxOpen(true)}
+              onClick={() => sortedProductImages.length > 0 && setLightboxOpen(true)}
             >
-              {productImages[selectedImage] ? (
+              {sortedProductImages[selectedImage] ? (
                 <Image
-                  src={productImages[selectedImage].url}
-                  alt={productImages[selectedImage].alt || product.name}
+                  src={sortedProductImages[selectedImage].url}
+                  alt={sortedProductImages[selectedImage].alt || product.name}
                   width={0}
                   height={0}
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -360,9 +381,9 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
                 <div className="flex h-48 items-center justify-center text-gray-400">No Image</div>
               )}
             </div>
-            {productImages.length > 1 && (
+            {sortedProductImages.length > 1 && (
               <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
-                {productImages.map((image, idx) => {
+                {sortedProductImages.map((image, idx) => {
                   const isActive = idx === selectedImage;
                   const isHovered = idx === hoveredThumb;
                   const thumbColor = imageVariantColor.get(image.url) ?? "#111827";
@@ -399,7 +420,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
             )}
 
             {/* Product name */}
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-gray-900">{product.name}</h1>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-gray-900">{productDisplayName(product.name)}</h1>
 
             {/* Rating */}
             {ratingStars != null && (
@@ -551,13 +572,19 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
               <div className="flex items-center gap-3 text-sm text-gray-600">
                 <Truck className="h-5 w-5 flex-shrink-0" style={{ color: "#FFCC00" }} />
                 <span>
-                  <strong className="text-gray-900">Free shipping</strong> — ships worldwide in a protective tube
+                  <strong className="text-gray-900">DHL</strong> worldwide shipping
                 </span>
               </div>
               <div className="flex items-center gap-3 text-sm text-gray-600">
                 <Clock className="h-5 w-5 flex-shrink-0 text-blue-500" />
                 <span>
                   <strong className="text-gray-900">Estimated delivery</strong> — 5–10 business days
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-gray-600">
+                <MapPin className="h-5 w-5 flex-shrink-0 text-orange-500" />
+                <span>
+                  <strong className="text-gray-900">Free collection</strong> — pick up at our Nairobi studio
                 </span>
               </div>
               {selectedVariant && (
@@ -575,35 +602,70 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
               <div className="mt-6 flex items-center gap-3 flex-wrap">
                 <Share2 className="h-4 w-4 text-purple-500" />
                 <span className="text-sm text-gray-600">Share this product</span>
-                <div className="flex gap-3">
-                  <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-blue-600 transition-colors"
-                    aria-label="Share on Facebook"
-                  >
+                <div className="flex gap-3 flex-wrap">
+                  {/* Facebook */}
+                  <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600 transition-colors" aria-label="Share on Facebook">
                     <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
                   </a>
-                  <a
-                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(product.name)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-gray-900 transition-colors"
-                    aria-label="Share on X"
-                  >
+                  {/* X / Twitter */}
+                  <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(product.name)}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-900 transition-colors" aria-label="Share on X">
                     <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
                   </a>
-                  <a
-                    href={`https://wa.me/?text=${encodeURIComponent(product.name + " " + shareUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-green-600 transition-colors"
-                    aria-label="Share on WhatsApp"
-                  >
+                  {/* LinkedIn */}
+                  <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-700 transition-colors" aria-label="Share on LinkedIn">
+                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
+                  </a>
+                  {/* Pinterest */}
+                  <a href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&media=${encodeURIComponent(product.thumbnail?.url ?? "")}&description=${encodeURIComponent(product.name + " — Nairobi matatu art print by Dennis Muraguri")}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-600 transition-colors" aria-label="Pin on Pinterest">
+                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z" /></svg>
+                  </a>
+                  {/* WhatsApp */}
+                  <a href={`https://wa.me/?text=${encodeURIComponent(product.name + " " + shareUrl)}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-green-600 transition-colors" aria-label="Share on WhatsApp">
                     <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
                   </a>
+                  {/* Instagram — no web share URL; copies link for pasting into stories/bio */}
+                  <button
+                    onClick={async () => {
+                      try {
+                        if (navigator.share) {
+                          await navigator.share({ title: product.name, url: shareUrl });
+                        } else {
+                          await navigator.clipboard.writeText(shareUrl);
+                          setLinkCopied(true);
+                          setTimeout(() => setLinkCopied(false), 2000);
+                        }
+                      } catch {}
+                    }}
+                    className="text-gray-400 hover:text-pink-600 transition-colors"
+                    aria-label="Share on Instagram"
+                  >
+                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" /></svg>
+                  </button>
+                  {/* Snapchat */}
+                  <a href={`https://www.snapchat.com/scan?attachmentUrl=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors" aria-label="Share on Snapchat">
+                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.719-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.023 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.499-.739-2.436-2.846-2.436-4.629 0-3.769 2.737-7.229 7.892-7.229 4.144 0 7.365 2.953 7.365 6.899 0 4.117-2.595 7.431-6.199 7.431-1.211 0-2.354-.629-2.744-1.373l-.746 2.837c-.271 1.042-1.001 2.347-1.492 3.141.949.293 1.951.448 2.99.448 6.623 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z" /></svg>
+                  </a>
+                  {/* Email */}
+                  <a href={`mailto:?subject=${encodeURIComponent(product.name + " — Dennis Muraguri Art Prints")}&body=${encodeURIComponent("Check out this matatu art print: " + shareUrl)}`} className="text-gray-400 hover:text-gray-700 transition-colors" aria-label="Share via Email">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                  </a>
+                  {/* Copy link */}
+                  <button
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(shareUrl);
+                      setLinkCopied(true);
+                      setTimeout(() => setLinkCopied(false), 2000);
+                    }}
+                    className="text-gray-400 hover:text-gray-700 transition-colors"
+                    aria-label="Copy link"
+                  >
+                    {linkCopied
+                      ? <Check className="h-5 w-5 text-green-500" />
+                      : <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                    }
+                  </button>
                 </div>
+                {linkCopied && <span className="text-xs text-green-600 font-medium">Link copied!</span>}
               </div>
             )}
           </div>
@@ -766,14 +828,14 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
       </div>
 
       {/* Lightbox */}
-      {lightboxOpen && productImages.length > 0 && (
+      {lightboxOpen && sortedProductImages.length > 0 && (
         <div
           className="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center"
           onClick={() => setLightboxOpen(false)}
         >
           {/* Counter */}
           <span className="absolute top-4 left-4 text-white text-sm font-medium select-none">
-            {selectedImage + 1} / {productImages.length}
+            {selectedImage + 1} / {sortedProductImages.length}
           </span>
 
           {/* Close */}
@@ -786,10 +848,10 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
           </button>
 
           {/* Prev */}
-          {productImages.length > 1 && (
+          {sortedProductImages.length > 1 && (
             <button
               className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors bg-black/40 rounded-full p-2"
-              onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => (i - 1 + productImages.length) % productImages.length); }}
+              onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => (i - 1 + sortedProductImages.length) % sortedProductImages.length); }}
               aria-label="Previous"
             >
               <ChevronLeft className="h-7 w-7" />
@@ -802,8 +864,8 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={productImages[selectedImage].url}
-              alt={productImages[selectedImage].alt || product.name}
+              src={sortedProductImages[selectedImage].url}
+              alt={sortedProductImages[selectedImage].alt || product.name}
               fill
               className="object-contain"
               sizes="(max-width: 768px) 100vw, 768px"
@@ -811,10 +873,10 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
           </div>
 
           {/* Next */}
-          {productImages.length > 1 && (
+          {sortedProductImages.length > 1 && (
             <button
               className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors bg-black/40 rounded-full p-2"
-              onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => (i + 1) % productImages.length); }}
+              onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => (i + 1) % sortedProductImages.length); }}
               aria-label="Next"
             >
               <ChevronRight className="h-7 w-7" />
@@ -822,12 +884,12 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
           )}
 
           {/* Thumbnail strip */}
-          {productImages.length > 1 && (
+          {sortedProductImages.length > 1 && (
             <div
               className="absolute bottom-4 flex gap-2 overflow-x-auto max-w-full px-4"
               onClick={(e) => e.stopPropagation()}
             >
-              {productImages.map((image, idx) => (
+              {sortedProductImages.map((image, idx) => (
                 <button
                   key={image.id}
                   onClick={() => setSelectedImage(idx)}
@@ -848,13 +910,13 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg p-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {productImages[0] && (
+              {sortedProductImages[0] && (
                 <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md">
-                  <Image src={productImages[0].url} alt={product.name} fill className="object-cover" />
+                  <Image src={sortedProductImages[0].url} alt={product.name} fill className="object-cover" />
                 </div>
               )}
               <div>
-                <h4 className="font-medium text-gray-900">{product.name}</h4>
+                <h4 className="font-medium text-gray-900">{productDisplayName(product.name)}</h4>
                 <p className="text-gray-700 font-semibold">{formatPrice(currentAmount, currentCurrency)}</p>
               </div>
             </div>
@@ -877,7 +939,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
             "@type": "Product",
             name: product.name,
             description: product.seoDescription || product.description,
-            image: productImages.map((img) => img.url),
+            image: sortedProductImages.map((img) => img.url),
             sku: selectedVariant?.sku || product.variants[0]?.sku,
             offers: {
               "@type": "Offer",
