@@ -1,16 +1,14 @@
 {
-  "name": "Store",
-  "short_name": "Store",
-  "description": "Premium E-commerce Store",
+  "name": "Dennis Muraguri Art Prints",
+  "short_name": "DENO Prints",
+  "description": "Original matatu and sacco art prints by Nairobi artist Dennis Muraguri.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4f46e5",
   "icons": [
-    {
-      "src": "/favicon.ico",
-      "sizes": "48x48",
-      "type": "image/x-icon"
-    }
+    { "src": "/favicon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/favicon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512x512.png",    "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

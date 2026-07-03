@@ -24,6 +24,7 @@ interface HeaderProps {
 const DEFAULT_MENU: MenuItem[] = [
   { id: "1", name: "Shop DENO", url: "/products" },
   { id: "saccos", name: "Shop SACCO", url: "/saccos" },
+  { id: "beba", name: "Shop BEBA", url: "/beba" },
   { id: "attire", name: "Shop ATTIRE", url: "/attire" },
 ];
 

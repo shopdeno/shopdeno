@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Check, XCircle, Loader2 } from "lucide-react";
 
 type State = "loading" | "success" | "error";
 
-export default function CheckoutReturnPage() {
+function CheckoutReturn() {
   const searchParams = useSearchParams();
   const [state, setState] = useState<State>("loading");
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -137,5 +137,19 @@ export default function CheckoutReturnPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutReturnPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
+        </div>
+      }
+    >
+      <CheckoutReturn />
+    </Suspense>
   );
 }

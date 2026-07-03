@@ -457,6 +457,15 @@ async function assignMediaToVariant(variantId, mediaId) {
   if (errs?.length) throw new Error(JSON.stringify(errs));
 }
 
+async function deleteProductMedia(mediaId) {
+  const r = await gql(
+    `mutation($id:ID!){ productMediaDelete(id:$id){ errors{field message} } }`,
+    { id: mediaId }
+  );
+  const errs = r?.productMediaDelete?.errors;
+  if (errs?.length) throw new Error(JSON.stringify(errs));
+}
+
 // ---------- stage: variant-images ----------
 async function stageVariantImages() {
   let products = await fetchAllWcProducts();
@@ -898,8 +907,8 @@ const ADD_THESE_DIR = process.env.ADD_THESE_DIR
 // Stale folder names → correct Saleor product slugs
 const FOLDER_OVERRIDES = {
   "Beat Port Front - Ongata Line Transporters": "beat-port-ongata-line-transporters-4062",
-  "Ferrari - Umo Inner Sacco": "ferrari-umo-inner-sacco-4065",
-  "The Money Team - Umo Inner Sacco": "the-money-team-umo-inner-sacco-4053",
+  "Ferrari - Umoinner Sacco": "ferrari-umo-inner-sacco-4065",
+  "TMT (The Money Team) - Umoinner Sacco": "the-money-team-umo-inner-sacco-4053",
 };
 
 const normalizeName = (s) =>
@@ -1003,6 +1012,116 @@ async function stageAddThese() {
   console.log(`add-these: ${uploaded} uploaded, ${skipped} skipped/existing, ${missing} unmatched folders`);
 }
 
+// ---------- stage: add-these-swatches ----------
+// For products in "add these/" with named-colour image files (e.g. -matatu-art-print-blue.webp):
+// deletes existing product media (uploaded without colour info by add-these), re-uploads each
+// image with colour in the alt text, creates the colour variant, and assigns the media.
+// Also handles Beba/ subfolders, each of which maps to its own Saleor product.
+async function stageAddTheseSwatches() {
+  const allProducts = await getAllProducts();
+  const byNorm = new Map(allProducts.map((p) => [normalizeName(p.name), p]));
+  const bySlug = new Map(allProducts.map((p) => [p.slug, p]));
+
+  const tmpDir = mkdtempSync(join(tmpdir(), "add-swatches-"));
+  const IMAGE_EXTS = /\.(jpg|jpeg|webp|png|avif|gif)$/i;
+  let created = 0, assigned = 0, skipped = 0, fail = 0;
+
+  // Build list of {folder, folderPath, prod} entries:
+  // top-level (excluding Beba/) + Beba/* subfolders
+  const entries = [];
+  for (const d of readdirSync(ADD_THESE_DIR, { withFileTypes: true })) {
+    if (!d.isDirectory()) continue;
+    if (d.name === "Beba") {
+      // Each subfolder of Beba/ is its own product
+      const bebaPath = join(ADD_THESE_DIR, "Beba");
+      for (const sub of readdirSync(bebaPath, { withFileTypes: true })) {
+        if (sub.isDirectory()) entries.push({ folder: sub.name, folderPath: join(bebaPath, sub.name), useOverrides: false });
+      }
+    } else {
+      entries.push({ folder: d.name, folderPath: join(ADD_THESE_DIR, d.name), useOverrides: true });
+    }
+  }
+
+  for (const { folder, folderPath, useOverrides } of entries) {
+    const files = readdirSync(folderPath, { withFileTypes: true })
+      .filter((f) => f.isFile() && IMAGE_EXTS.test(f.name))
+      .map((f) => f.name);
+
+    const colorFiles = [];
+    for (const file of files) {
+      const base = basename(file, extname(file));
+      const match = base.match(/-matatu-art-print-(.+)$/);
+      if (!match) continue;
+      const color = match[1];
+      if (/^\d+$/.test(color)) continue;
+      colorFiles.push({ file, color });
+    }
+
+    if (colorFiles.length === 0) { skipped++; continue; }
+
+    const overrideSlug = useOverrides ? FOLDER_OVERRIDES[folder] : null;
+    const prod = overrideSlug ? bySlug.get(overrideSlug) : byNorm.get(normalizeName(folder));
+    if (!prod) {
+      console.warn(`  ⚠ no Saleor match for folder "${folder}"`);
+      skipped++;
+      continue;
+    }
+    console.log(`  ${prod.name}: ${colorFiles.length} colour variant(s)`);
+
+    const prodData = await gql(
+      `query($id:ID!){product(id:$id){media{id alt} variants{id sku attributes{attribute{slug}values{name}} media{id}} productType{id}}}`,
+      { id: prod.id }
+    );
+    let media = prodData.product?.media || [];
+    let variants = prodData.product?.variants || [];
+
+    if (prodData.product?.productType?.id !== ctx.variableTypeId) {
+      console.log(`    ↻ converting to variable type...`);
+      prod.id = await convertToVariableType(prod.id);
+      media = [];
+      variants = [];
+    }
+
+    for (const m of media) {
+      await deleteProductMedia(m.id);
+      console.log(`    🗑 deleted old media`);
+    }
+
+    for (const { file, color } of colorFiles) {
+      try {
+        await ensureColorValue(color);
+
+        let variantId;
+        const existing = variants.find((v) =>
+          v.attributes.some(
+            (a) => a.attribute.slug === "color" && a.values.some((val) => val.name.toLowerCase() === color.toLowerCase())
+          )
+        );
+        if (!existing) {
+          variantId = await upsertVariant(prod.id, `DM-${prod.slug}-${color}`, "50", color);
+          created++;
+          console.log(`    + variant: ${color}`);
+        } else {
+          variantId = existing.id;
+        }
+
+        const src = join(folderPath, file);
+        const jpgPath = join(tmpDir, `${prod.slug}-${color}.jpg`);
+        execFileSync("sips", ["-s", "format", "jpeg", src, "--out", jpgPath], { stdio: "ignore" });
+        const mediaId = await uploadMedia(prod.id, jpgPath, `${folder} ${color} matatu art print by Dennis Muraguri`);
+        await assignMediaToVariant(variantId, mediaId);
+        assigned++;
+        console.log(`    ✓ ${color} assigned`);
+      } catch (e) {
+        fail++;
+        console.error(`    ✗ ${folder}/${color}: ${e.message}`);
+      }
+    }
+  }
+
+  console.log(`add-these-swatches: ${created} variants created, ${assigned} assigned, ${skipped} skipped, ${fail} failed`);
+}
+
 // ---------- stage: delete-test-products ----------
 const TEST_PRODUCT_NAMES = (process.env.TEST_PRODUCT_NAMES || "nini").split(",").map((s) => s.trim());
 
@@ -1028,7 +1147,7 @@ const stage = process.argv[2];
 (async () => {
   await saleorLogin();
   await loadContext();
-  if (["setup", "products", "images", "create-local-products", "local-assign-swatches", "all"].includes(stage)) await stageSetup();
+  if (["setup", "products", "images", "create-local-products", "local-assign-swatches", "add-these-swatches", "all"].includes(stage)) await stageSetup();
   if (stage === "setup") { /* done */ }
   else if (stage === "categories" || stage === "all") await stageCategories();
   if (stage === "products" || stage === "all") await stageProducts();
@@ -1039,9 +1158,10 @@ const stage = process.argv[2];
   if (stage === "publish-drafts") await stagePublishDrafts();
   if (stage === "local-assign-swatches") await stageLocalAssignSwatches();
   if (stage === "add-these") await stageAddThese();
+  if (stage === "add-these-swatches") await stageAddTheseSwatches();
   if (stage === "delete-test-products") await stageDeleteTestProducts();
-  if (!["setup", "categories", "products", "images", "variant-images", "local-images", "create-local-products", "publish-drafts", "local-assign-swatches", "add-these", "delete-test-products", "all"].includes(stage)) {
-    console.error("Usage: node scripts/migrate-woo-to-saleor.mjs <setup|categories|products|images|variant-images|local-images|create-local-products|publish-drafts|local-assign-swatches|add-these|delete-test-products|all> [--limit N] [--status any] [--only wooId]");
+  if (!["setup", "categories", "products", "images", "variant-images", "local-images", "create-local-products", "publish-drafts", "local-assign-swatches", "add-these", "add-these-swatches", "delete-test-products", "all"].includes(stage)) {
+    console.error("Usage: node scripts/migrate-woo-to-saleor.mjs <setup|categories|products|images|variant-images|local-images|create-local-products|publish-drafts|local-assign-swatches|add-these|add-these-swatches|delete-test-products|all> [--limit N] [--status any] [--only wooId]");
     process.exit(1);
   }
   console.log("done.");

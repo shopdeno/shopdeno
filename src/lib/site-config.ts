@@ -53,3 +53,28 @@ export const siteConfig = {
     { name: "Terms and Conditions", href: "/term-and-conditions" },
   ],
 } as const;
+
+/** Strip route/sacco suffixes from display names (e.g. " - Rongao Sacco", " - Route 15", " - Ngong Matatu OA"). */
+export function productDisplayName(name: string): string {
+  return name
+    .replace(/\s*[-–]\s*.+?\s+(?:Sacco|Transporters|OA)\s*$/i, "")
+    .replace(/\s*[-–]\s*Route\s+\d+\s*$/i, "")
+    .trim();
+}
+
+// Products pinned to top of grid and exclusively shown in homepage stripe 1.
+export const FEATURED_SLUGS = new Set([
+  "attitude-nmoa-sacco",
+  "bash-kacose-sacco",
+  "bash-2-kacose-sacco",
+  "dexter-umo-inner-sacco",
+  "krooks-4057",
+  "lakers-kacose-sacco",
+  "matatu-and-tractor",
+  "matuta-kacose-sacco",
+  "minion-ebet-sacco-4046",
+  "pig-society-rog-sacco-4047",
+  "salt-n-peppa-expresso-sacco",
+  "sugar-rongao-sacco",
+  "warembo-bila-make-up-4051",
+]);

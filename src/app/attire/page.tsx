@@ -9,32 +9,30 @@ export const metadata: Metadata = {
 };
 
 const TEES = [
-  "dennis_muraguri_1761121443_3748880838793108272_6951237033.jpg",
-  "dennis_muraguri_1761121443_3748880838793145820_6951237033.jpg",
-  "dennis_muraguri_1761121443_3748880838801503511_6951237033.jpg",
-  "dennis_muraguri_1761121443_3748880838801529100_6951237033.jpg",
-  "dennis_muraguri_1763650264_3770094129414421109_6951237033.jpg",
-  "dennis_muraguri_1763650264_3770094129733227993_6951237033.jpg",
-  "dennis_muraguri_1765389432_3784683324480947209_6951237033.jpg",
-  "dennis_muraguri_1765389432_3784683325193985952_6951237033.jpg",
+  "tees/dennis_muraguri_1761121443_3748880838793108272_6951237033.jpg",
+  "tees/dennis_muraguri_1761121443_3748880838793145820_6951237033.jpg",
+  "tees/dennis_muraguri_1761121443_3748880838801503511_6951237033.jpg",
+  "tees/dennis_muraguri_1636603739_2704350636765563673_6951237033.jpg",
+  "tees/dennis_muraguri_1687526163_3131518888746086076_6951237033.webp",
+  "tees/dennis_muraguri_1765389432_3784683324480947209_6951237033.jpg",
+  "tees/dennis_muraguri_1765389432_3784683325193985952_6951237033.jpg",
+  "totes/dennis_muraguri_1761736442_3754039823645044375_6951237033.jpg",
+  "tees/homienextdoo_1760292644_3741928368401835929_46567365421.jpg",
+  "totes/dennis_muraguri_1761736442_3754039823653449937_6951237033.jpg",
+  "totes/dennis_muraguri_1761121443_3748880839128664068_6951237033.jpg",
 ];
 
 const TOTES = [
-  "dennis_muraguri_1759921504_3738815027885948603_6951237033.jpg",
-  "dennis_muraguri_1759921504_3738815027894303485_6951237033.jpg",
-  "dennis_muraguri_1759921504_3738815028146005780_6951237033.jpg",
-  "dennis_muraguri_1760015810_3739606121032756445_6951237033.jpg",
-  "dennis_muraguri_1761736442_3754039823645044375_6951237033.jpg",
-  "dennis_muraguri_1761736442_3754039823653439473_6951237033.jpg",
-  "dennis_muraguri_1761736442_3754039823653449937_6951237033.jpg",
-  "dennis_muraguri_1761121443_3748880839128664068_6951237033.jpg",
+  "totes/dennis_muraguri_1759921504_3738815027894303485_6951237033.jpg",
+  "totes/dennis_muraguri_1759921504_3738815028146005780_6951237033.jpg",
+  "totes/dennis_muraguri_1760015810_3739606121032756445_6951237033.jpg",
 ];
 
 const TAGS = [
-  "dennis_muraguri_1759921504_3738815027877519529_6951237033.jpg",
-  "dennis_muraguri_1773175513_3849997708127911799_6951237033.jpg",
-  "dennis_muraguri_1773175513_3849997708497044029_6951237033.jpg",
-  "dennis_muraguri_1773175513_3849997708966788184_6951237033.jpg",
+  "tags/dennis_muraguri_1759921504_3738815027877519529_6951237033.jpg",
+  "tags/dennis_muraguri_1773175513_3849997708127911799_6951237033.jpg",
+  "tags/dennis_muraguri_1773175513_3849997708966788184_6951237033.jpg",
+  "totes/dennis_muraguri_1759921504_3738815027885948603_6951237033.jpg",
 ];
 
 const TOPS = [
@@ -85,32 +83,25 @@ export default function AttirePage() {
           {TEES.slice(0, 4).map((file) => (
             <div key={file} className="relative aspect-square overflow-hidden bg-gray-900">
               <Image
-                src={`/attire/tees/${file}`}
+                src={`/attire/${file}`}
                 alt="Dennis Muraguri graphic tee"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-500"
               />
             </div>
           ))}
-          {/* video cell */}
           <div className="relative aspect-square overflow-hidden bg-gray-900">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source
-                src="/attire/tees/dennis_muraguri_1763835492_3771647333335845459_6951237033.mp4"
-                type="video/mp4"
-              />
-            </video>
+            <Image
+              src="/attire/tees/dennis_muraguri_1761121443_3748880838801529100_6951237033.jpg"
+              alt="Dennis Muraguri graphic tee"
+              fill
+              className="object-cover hover:scale-105 transition-transform duration-500"
+            />
           </div>
           {TEES.slice(4).map((file) => (
             <div key={file} className="relative aspect-square overflow-hidden bg-gray-900">
               <Image
-                src={`/attire/tees/${file}`}
+                src={`/attire/${file}`}
                 alt="Dennis Muraguri graphic tee"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-500"
@@ -127,10 +118,10 @@ export default function AttirePage() {
           <span className="text-xs text-white/40 uppercase tracking-widest">Dropping soon</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1">
-          {TOTES.slice(0, 6).map((file) => (
+          {TOTES.map((file) => (
             <div key={file} className="relative aspect-square overflow-hidden bg-gray-900">
               <Image
-                src={`/attire/totes/${file}`}
+                src={`/attire/${file}`}
                 alt="Dennis Muraguri tote bag"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-500"
@@ -152,16 +143,6 @@ export default function AttirePage() {
               />
             </video>
           </div>
-          {TOTES.slice(6).map((file) => (
-            <div key={file} className="relative aspect-square overflow-hidden bg-gray-900">
-              <Image
-                src={`/attire/totes/${file}`}
-                alt="Dennis Muraguri tote bag"
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-          ))}
         </div>
       </section>
 
@@ -173,7 +154,7 @@ export default function AttirePage() {
           {TAGS.map((file) => (
             <div key={file} className="relative aspect-square overflow-hidden bg-gray-900">
               <Image
-                src={`/attire/tags/${file}`}
+                src={`/attire/${file}`}
                 alt="Dennis Muraguri attire hang tag"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-500"

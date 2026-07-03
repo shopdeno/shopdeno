@@ -9,6 +9,7 @@ export const SACCO_CATEGORY_SLUGS = [
   "expresso-sacco",
   "fastrack-u-sacco",
   "kacose-sacco",
+  "kmos-sacco",
   "luminous-sacco",
   "metro-class-sacco",
   "ngong-matatu-oa",
@@ -23,9 +24,7 @@ export const SACCO_CATEGORY_SLUGS = [
   "south-b-owners-sacco",
   "umo-inner-sacco",
   // Nairobi matatu routes
-  "route-8",
   "route-15",
-  "route-46",
   "route-58",
   "route-125",
 ] as const;

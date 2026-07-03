@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getSaleorClient, getChannel } from "@/lib/saleor";
 import { PRODUCTS_QUERY } from "@/graphql/queries";
-import { siteConfig } from "@/lib/site-config";
+import { siteConfig, FEATURED_SLUGS, productDisplayName } from "@/lib/site-config";
 import { VideoModal } from "@/components/VideoModal";
 
 // Static metadata must live in a separate layout or route segment when using
@@ -73,7 +73,7 @@ function ProductStripe({
                         </div>
                       )}
                     </div>
-                    <h3 className="mt-3 text-sm font-medium text-gray-700">{product.name}</h3>
+                    <h3 className="mt-3 text-sm font-medium text-gray-700">{productDisplayName(product.name)}</h3>
                     {price && (
                       <p className="mt-1 text-sm font-medium text-gray-900">
                         {new Intl.NumberFormat("en-US", {
@@ -107,7 +107,7 @@ export default function HomePage() {
       try {
         const result: any = await client.query(PRODUCTS_QUERY, {
           channel,
-          first: 12,
+          first: 100,
           sortBy: { field: "PUBLICATION_DATE", direction: "DESC" },
         });
         setProducts(result.data?.products?.edges || []);
@@ -124,6 +124,12 @@ export default function HomePage() {
     }, 1000);
     return () => clearInterval(id);
   }, [products.length]);
+
+  const featuredProducts = products.filter(({ node }: any) => FEATURED_SLUGS.has(node.slug));
+  const bebaProducts = products.filter(({ node }: any) => node.category?.slug?.includes("beba"));
+  const nonFeaturedNonBeba = products.filter(
+    ({ node }: any) => !FEATURED_SLUGS.has(node.slug) && !node.category?.slug?.includes("beba")
+  );
 
   return (
     <div>
@@ -203,11 +209,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Product Stripe 1 ── */}
+      {/* ── Product Stripe 1 — featured products only ── */}
       <ProductStripe
-        products={products}
+        products={featuredProducts}
         offset={0}
-        heading="Start Your Collection Today"
+        heading="New to the Collection"
         linkText="Shop all prints →"
       />
 
@@ -248,7 +254,7 @@ export default function HomePage() {
 
       {/* ── Product Stripe 2 ── */}
       <ProductStripe
-        products={products}
+        products={nonFeaturedNonBeba}
         offset={4}
         heading="Bring Nairobi's Streets to Your Walls"
         linkText="Browse the collection →"
@@ -280,12 +286,12 @@ export default function HomePage() {
               Explore art prints collection.
             </Link>
 
-            {/* Mini product carousel */}
-            {products.length > 0 && (
+            {/* Mini product carousel — Beba prints only */}
+            {bebaProducts.length > 0 && (
               <div className="mt-8">
                 <div className="grid grid-cols-2 gap-4">
                   {Array.from({ length: CAROUSEL_VISIBLE }).map((_, i) => {
-                    const item = products[(carouselIndex + i) % products.length]?.node;
+                    const item = bebaProducts[(carouselIndex + i) % bebaProducts.length]?.node;
                     if (!item) return null;
                     const price = item.pricing?.priceRange?.start?.gross;
                     const imgUrl = item.media?.[0]?.url ?? item.thumbnail?.url;
@@ -301,7 +307,7 @@ export default function HomePage() {
                             />
                           )}
                         </div>
-                        <p className="mt-2 text-sm font-medium text-gray-800 leading-tight line-clamp-2">{item.name}</p>
+                        <p className="mt-2 text-sm font-medium text-gray-800 leading-tight line-clamp-2">{productDisplayName(item.name)}</p>
                         {price && (
                           <p className="text-sm text-indigo-600 font-semibold mt-0.5">
                             {new Intl.NumberFormat("en-US", { style: "currency", currency: price.currency }).format(price.amount)}
@@ -313,20 +319,20 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-3 mt-4">
                   <button
-                    onClick={() => setCarouselIndex((i) => (i - 1 + products.length) % products.length)}
+                    onClick={() => setCarouselIndex((i) => (i - 1 + bebaProducts.length) % bebaProducts.length)}
                     className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 hover:border-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
                     aria-label="Previous print"
                   >
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                   </button>
                   <button
-                    onClick={() => setCarouselIndex((i) => (i + 1) % products.length)}
+                    onClick={() => setCarouselIndex((i) => (i + 1) % bebaProducts.length)}
                     className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 hover:border-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
                     aria-label="Next print"
                   >
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                   </button>
-                  <span className="text-xs text-gray-400">{carouselIndex + 1} / {products.length}</span>
+                  <span className="text-xs text-gray-400">{carouselIndex + 1} / {bebaProducts.length}</span>
                 </div>
               </div>
             )}
@@ -371,7 +377,7 @@ export default function HomePage() {
 
       {/* ── Product Stripe 3 ── */}
       <ProductStripe
-        products={products}
+        products={nonFeaturedNonBeba}
         offset={8}
         heading="Own a Piece Signed by the Artist"
         linkText="Find your print →"
@@ -413,7 +419,7 @@ export default function HomePage() {
                               />
                             )}
                           </div>
-                          <p className="mt-2 text-sm font-medium text-white leading-tight line-clamp-2">{item.name}</p>
+                          <p className="mt-2 text-sm font-medium text-white leading-tight line-clamp-2">{productDisplayName(item.name)}</p>
                           {price && (
                             <p className="text-sm text-indigo-400 font-semibold mt-0.5">
                               {new Intl.NumberFormat("en-US", { style: "currency", currency: price.currency }).format(price.amount)}
@@ -484,9 +490,9 @@ export default function HomePage() {
 
       {/* ── Product Stripe 4 ── */}
       <ProductStripe
-        products={products}
+        products={nonFeaturedNonBeba}
         offset={2}
-        heading="More From the Collection"
+        heading="Start Your Collection Today"
         linkText="See every print →"
       />
 
@@ -541,7 +547,7 @@ export default function HomePage() {
 
       {/* ── Product Stripe 5 ── */}
       <ProductStripe
-        products={products}
+        products={nonFeaturedNonBeba}
         offset={6}
         heading="Gallery-Quality Prints for Your Home"
         linkText="Shop the range →"
@@ -594,7 +600,7 @@ export default function HomePage() {
 
       {/* ── Product Stripe 6 ── */}
       <ProductStripe
-        products={products}
+        products={nonFeaturedNonBeba}
         offset={10}
         heading="Prints That Tell Nairobi's Story"
         linkText="Explore all designs →"
@@ -639,7 +645,7 @@ export default function HomePage() {
 
       {/* ── Product Stripe 7 ── */}
       <ProductStripe
-        products={products}
+        products={nonFeaturedNonBeba}
         offset={1}
         heading="Join Collectors Around the World"
         linkText="Order yours today →"
