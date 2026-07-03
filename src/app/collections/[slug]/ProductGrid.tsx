@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ProductCard } from "@/components/ProductCard";
 
 interface Collection {
   id: string;
@@ -21,27 +21,12 @@ interface Product {
   id: string;
   name: string;
   slug: string;
-  thumbnail?: {
-    url: string;
-    alt?: string;
-  };
+  thumbnail?: { url: string; alt?: string };
+  media?: { url: string; alt?: string }[];
+  variants?: { id: string; media?: { url: string; alt?: string }[] }[];
   pricing: {
-    priceRange: {
-      start?: {
-        gross: {
-          amount: number;
-          currency: string;
-        };
-      };
-    };
-    priceRangeUndiscounted?: {
-      start?: {
-        gross: {
-          amount: number;
-          currency: string;
-        };
-      };
-    };
+    priceRange: { start?: { gross: { amount: number; currency: string } } };
+    priceRangeUndiscounted?: { start?: { gross: { amount: number; currency: string } } };
   };
 }
 
@@ -81,13 +66,6 @@ export function ProductGrid({
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const formatPrice = (amount: number, currency: string) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency,
-    }).format(amount);
-  };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -163,47 +141,9 @@ export function ProductGrid({
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4 xl:gap-x-8">
-            {products.map(({ node: product }: any) => {
-              const price = product.pricing?.priceRange?.start?.gross;
-              const originalPrice = product.pricing?.priceRangeUndiscounted?.start?.gross;
-              const hasDiscount = originalPrice && price && originalPrice.amount > price.amount;
-
-              return (
-                <Link
-                  key={product.id}
-                  href={`/products/${product.slug}`}
-                  className="group"
-                >
-                  <div className="aspect-square w-full overflow-hidden rounded-lg bg-gray-100 relative">
-                    {product.thumbnail ? (
-                      <Image
-                        src={product.thumbnail.url}
-                        alt={product.thumbnail.alt || product.name}
-                        fill
-                        className="object-cover object-center group-hover:opacity-75 transition-opacity"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center bg-gray-200">
-                        <span className="text-gray-400">No Image</span>
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="mt-4 text-sm font-medium text-gray-700">
-                    {product.name}
-                  </h3>
-                  <div className="mt-1 flex items-center gap-2">
-                    <p className="text-sm font-medium text-gray-900">
-                      {price ? formatPrice(price.amount, price.currency) : "N/A"}
-                    </p>
-                    {hasDiscount && (
-                      <p className="text-sm text-gray-500 line-through">
-                        {formatPrice(originalPrice.amount, originalPrice.currency)}
-                      </p>
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
+            {products.map(({ node: product }) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         )}
 

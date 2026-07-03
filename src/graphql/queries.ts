@@ -86,8 +86,15 @@ export const PRODUCTS_QUERY = gql`
               }
             }
           }
+          category {
+            slug
+          }
           variants {
             id
+            media {
+              url
+              alt
+            }
           }
         }
       }
@@ -110,6 +117,13 @@ export const RELATED_PRODUCTS_QUERY = gql`
           thumbnail(size: 1024) {
             url
             alt
+          }
+          variants {
+            id
+            media {
+              url
+              alt
+            }
           }
           pricing {
             priceRange {
