@@ -71,12 +71,8 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await updateEmail(email);
-    setStep("shipping");
-  };
-
-  const handleAddressSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     await updateAddress(address, "shipping");
+    // updateAddress calls setStep("shipping") on success
   };
 
   const handleShippingSubmit = async (e: React.FormEvent) => {

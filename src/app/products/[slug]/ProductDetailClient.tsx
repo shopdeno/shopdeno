@@ -157,8 +157,14 @@ interface ProductDetailClientProps {
 export function ProductDetailClient({ product, relatedProducts = [] }: ProductDetailClientProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
-  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(() => product.variants[0] ?? null);
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    product.variants[0]?.attributes?.forEach((attr) => {
+      if (attr.values?.[0]) initial[attr.attribute.slug] = attr.values[0].slug;
+    });
+    return initial;
+  });
   const [quantity, setQuantity] = useState(1);
   const [showStickyBar, setShowStickyBar] = useState(false);
   const [activeTab, setActiveTab] = useState<"description" | "reviews" | "shipping" | "policy">("description");
@@ -238,20 +244,6 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
       return aIdx - bIdx;
     });
   }, [product.variants, productImages, imageVariantAttrs]);
-
-  useEffect(() => {
-    if (product.variants.length > 0 && !selectedVariant) {
-      const firstVariant = product.variants[0];
-      setSelectedVariant(firstVariant);
-      const initialAttributes: Record<string, string> = {};
-      firstVariant.attributes?.forEach((attr) => {
-        if (attr.values?.[0]) {
-          initialAttributes[attr.attribute.slug] = attr.values[0].slug;
-        }
-      });
-      setSelectedAttributes(initialAttributes);
-    }
-  }, [product.variants, selectedVariant]);
 
   useEffect(() => {
     const handleScroll = () => setShowStickyBar(window.scrollY > 400);
