@@ -21,6 +21,7 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
     step,
     setStep,
     isLoading,
+    isInitializing,
     paymentMethod,
     setPaymentMethod,
     updateAddress,
@@ -36,18 +37,11 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
     subtotal: (checkout as any).subtotal ?? (checkout as any).total ?? { gross: { amount: 0, currency: "USD" } },
   } : null);
 
-  const [initialized, setInitialized] = useState(!!cartProp);
   useEffect(() => {
-    // Give CheckoutContext time to load from localStorage before deciding to redirect
-    const timer = setTimeout(() => setInitialized(true), 1500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (initialized && !checkout && !cartProp) {
+    if (!isInitializing && !checkout && !cartProp) {
       router.replace("/");
     }
-  }, [initialized, checkout, cartProp, router]);
+  }, [isInitializing, checkout, cartProp, router]);
 
   const [email, setEmail] = useState(checkout?.email || "");
   const [address, setAddress] = useState<Address>({
@@ -128,7 +122,7 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
     );
   }
 
-  if (!initialized || (!cart && !checkout)) {
+  if (isInitializing || (!cart && !checkout)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-gray-400" />

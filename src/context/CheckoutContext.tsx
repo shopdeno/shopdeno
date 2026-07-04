@@ -89,6 +89,7 @@ export interface Checkout {
 interface CheckoutContextType {
   checkout: Checkout | null;
   isLoading: boolean;
+  isInitializing: boolean;
   step: "information" | "shipping" | "payment" | "review";
   setStep: (step: "information" | "shipping" | "payment" | "review") => void;
   paymentMethod: PaymentMethod;
@@ -104,6 +105,7 @@ const CheckoutContext = createContext<CheckoutContextType | undefined>(undefined
 export function CheckoutProvider({ children }: { children: ReactNode }) {
   const [checkout, setCheckout] = useState<Checkout | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [step, setStep] = useState<"information" | "shipping" | "payment" | "review">("information");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("pickup");
 
@@ -121,21 +123,21 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function initCheckout() {
-      if (typeof window === "undefined") return;
+      if (typeof window === "undefined") { setIsInitializing(false); return; }
 
       const cartId = localStorage.getItem("cartId");
-      if (!cartId) return;
+      if (!cartId) { setIsInitializing(false); return; }
 
       const checkoutData = await fetchCheckout(cartId);
       if (checkoutData) {
         setCheckout(checkoutData);
-        
         if (checkoutData.deliveryMethod || checkoutData.shippingMethod) {
           setStep("payment");
         } else if (checkoutData.shippingAddress) {
           setStep("shipping");
         }
       }
+      setIsInitializing(false);
     }
     initCheckout();
   }, [fetchCheckout]);
@@ -289,6 +291,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
       value={{
         checkout,
         isLoading,
+        isInitializing,
         step,
         setStep,
         paymentMethod,
