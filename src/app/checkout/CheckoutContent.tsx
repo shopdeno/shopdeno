@@ -14,7 +14,7 @@ interface Cart {
   subtotal: { gross: { amount: number; currency: string } };
 }
 
-export function CheckoutContent({ cart }: { cart: Cart }) {
+export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
   const router = useRouter();
   const {
     checkout,
@@ -28,6 +28,27 @@ export function CheckoutContent({ cart }: { cart: Cart }) {
     updateDeliveryMethod,
     completeCheckout,
   } = useCheckout();
+
+  // Prefer prop (legacy SSR path), fall back to live checkout from context
+  const cart: Cart | null = cartProp ?? (checkout ? {
+    id: checkout.id,
+    lines: checkout.lines ?? [],
+    subtotal: (checkout as any).subtotal ?? (checkout as any).total ?? { gross: { amount: 0, currency: "USD" } },
+  } : null);
+
+  const [initialized, setInitialized] = useState(!!cartProp);
+  useEffect(() => {
+    // Give CheckoutContext time to load from localStorage before deciding to redirect
+    const timer = setTimeout(() => setInitialized(true), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (initialized && !checkout && !cartProp) {
+      router.replace("/");
+    }
+  }, [initialized, checkout, cartProp, router]);
+
   const [email, setEmail] = useState(checkout?.email || "");
   const [address, setAddress] = useState<Address>({
     firstName: "",
@@ -103,6 +124,14 @@ export function CheckoutContent({ cart }: { cart: Cart }) {
             Continue Shopping
           </Link>
         </div>
+      </div>
+    );
+  }
+
+  if (!initialized || (!cart && !checkout)) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
       </div>
     );
   }
@@ -501,7 +530,7 @@ export function CheckoutContent({ cart }: { cart: Cart }) {
               <h2 className="text-lg font-medium text-gray-900 mb-4">Order Summary</h2>
               
               <ul className="divide-y divide-gray-200 mb-4">
-                {cart.lines.map((line: any) => (
+                {cart!.lines.map((line: any) => (
                   <li key={line.id} className="py-4 flex gap-4">
                     <div className="relative h-16 w-16 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
                       {line.variant.product.thumbnail ? (
@@ -538,7 +567,7 @@ export function CheckoutContent({ cart }: { cart: Cart }) {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-medium">
-                    {formatPrice(cart.subtotal.gross.amount, cart.subtotal.gross.currency)}
+                    {formatPrice(cart!.subtotal.gross.amount, cart!.subtotal.gross.currency)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -551,8 +580,8 @@ export function CheckoutContent({ cart }: { cart: Cart }) {
                   <span>Total</span>
                   <span>
                     {formatPrice(
-                      (checkout?.total?.gross?.amount || cart.subtotal.gross.amount),
-                      (checkout?.total?.gross?.currency || cart.subtotal.gross.currency)
+                      (checkout?.total?.gross?.amount || cart!.subtotal.gross.amount),
+                      (checkout?.total?.gross?.currency || cart!.subtotal.gross.currency)
                     )}
                   </span>
                 </div>
