@@ -91,9 +91,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const closeCart = useCallback(() => setIsOpen(false), []);
   const toggleCart = useCallback(() => setIsOpen((prev) => !prev), []);
 
-  const createCart = useCallback(async () => {
+  const createCart = useCallback(async (lines: { variantId: string; quantity: number }[] = []) => {
     const result = await saleorClient.mutation(CREATE_CART_MUTATION, {
       channel: CHANNEL,
+      lines,
     });
     if (result.data?.checkoutCreate?.checkout) {
       const newCart = result.data.checkoutCreate.checkout;
@@ -113,32 +114,33 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function initCart() {
       if (typeof window === "undefined") return;
-
       const storedCartId = localStorage.getItem("cartId");
       if (storedCartId) {
         const fetchedCart = await fetchCart(storedCartId);
         if (fetchedCart) {
           setCart(fetchedCart);
-          return;
+        } else {
+          // Stale cartId — clear it; a new cart will be created on first addItem
+          localStorage.removeItem("cartId");
         }
-      }
-      const newCart = await createCart();
-      if (newCart) {
-        setCart(newCart);
       }
     }
     initCart();
-  }, [createCart, fetchCart]);
+  }, [fetchCart]);
 
   const addItem = useCallback(
     async (variantId: string, quantity = 1) => {
-      if (!cart) {
-        await createCart();
-        return;
-      }
-
       setIsLoading(true);
       try {
+        if (!cart) {
+          const newCart = await createCart([{ variantId, quantity }]);
+          if (newCart) {
+            setCart(newCart);
+            openCart();
+          }
+          return;
+        }
+
         const result = await saleorClient.mutation(ADD_TO_CART_MUTATION, {
           id: cart.id,
           lines: [{ variantId, quantity }],

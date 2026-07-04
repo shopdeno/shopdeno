@@ -46,8 +46,8 @@ const CART_FIELDS = gql`
 
 export const CREATE_CART_MUTATION = gql`
   ${CART_FIELDS}
-  mutation CreateCart($channel: String!) {
-    checkoutCreate(input: { channel: $channel }) {
+  mutation CreateCart($channel: String!, $lines: [CheckoutLineInput!]!) {
+    checkoutCreate(input: { channel: $channel, lines: $lines }) {
       checkout {
         ...CartFields
       }
