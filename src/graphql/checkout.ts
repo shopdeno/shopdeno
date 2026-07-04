@@ -88,10 +88,8 @@ export const GET_CHECKOUT_QUERY = gql`
         id
         name
         price {
-          gross {
-            amount
-            currency
-          }
+          amount
+          currency
         }
       }
       availableCollectionPoints {

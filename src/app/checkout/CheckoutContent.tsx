@@ -385,7 +385,7 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
                           <span className="ml-3">{method.name}</span>
                         </div>
                         <span className="font-medium">
-                          {formatPrice(method.price.gross.amount, method.price.gross.currency)}
+                          {formatPrice(method.price.amount, method.price.currency)}
                         </span>
                       </label>
                     ))}

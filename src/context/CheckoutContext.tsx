@@ -49,7 +49,7 @@ export interface CartLine {
       thumbnail?: { url: string; alt?: string };
     };
     pricing: {
-      price: { gross: { amount: number; currency: string } };
+      price: { amount: number; currency: string };
     };
   };
 }
@@ -79,7 +79,7 @@ export interface Checkout {
   availableShippingMethods: {
     id: string;
     name: string;
-    price: { gross: { amount: number; currency: string } };
+    price: { amount: number; currency: string };
   }[];
   availableCollectionPoints?: CollectionPoint[];
   shippingMethod?: { id: string; name: string };
