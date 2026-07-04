@@ -1,48 +1,55 @@
 import { gql } from "graphql-tag";
 
-export const CREATE_CART_MUTATION = gql`
-  mutation CreateCart($channel: String!) {
-    cartCreate(input: { channel: $channel }) {
-      cart {
+const CART_FIELDS = gql`
+  fragment CartFields on Checkout {
+    id
+    lines {
+      id
+      quantity
+      variant {
         id
-        lines {
+        name
+        sku
+        product {
           id
-          quantity
-          variant {
-            id
-            name
-            sku
-            product {
-              id
-              name
-              slug
-              thumbnail {
-                url
-                alt
-              }
-            }
-            pricing {
-              price {
-                gross {
-                  amount
-                  currency
-                }
-              }
+          name
+          slug
+          thumbnail {
+            url
+            alt
+          }
+        }
+        pricing {
+          price {
+            gross {
+              amount
+              currency
             }
           }
         }
-        subtotal {
-          gross {
-            amount
-            currency
-          }
-        }
-        total {
-          gross {
-            amount
-            currency
-          }
-        }
+      }
+    }
+    subtotal: subtotalPrice {
+      gross {
+        amount
+        currency
+      }
+    }
+    total: totalPrice {
+      gross {
+        amount
+        currency
+      }
+    }
+  }
+`;
+
+export const CREATE_CART_MUTATION = gql`
+  ${CART_FIELDS}
+  mutation CreateCart($channel: String!) {
+    checkoutCreate(input: { channel: $channel }) {
+      checkout {
+        ...CartFields
       }
       errors {
         field
@@ -53,48 +60,11 @@ export const CREATE_CART_MUTATION = gql`
 `;
 
 export const ADD_TO_CART_MUTATION = gql`
-  mutation AddToCart($cartId: ID!, $lines: [CartLineInput!]!) {
-    cartLinesAdd(cartId: $cartId, lines: $lines) {
-      cart {
-        id
-        lines {
-          id
-          quantity
-          variant {
-            id
-            name
-            sku
-            product {
-              id
-              name
-              slug
-              thumbnail {
-                url
-                alt
-              }
-            }
-            pricing {
-              price {
-                gross {
-                  amount
-                  currency
-                }
-              }
-            }
-          }
-        }
-        subtotal {
-          gross {
-            amount
-            currency
-          }
-        }
-        total {
-          gross {
-            amount
-            currency
-          }
-        }
+  ${CART_FIELDS}
+  mutation AddToCart($id: ID!, $lines: [CheckoutLineInput!]!) {
+    checkoutLinesAdd(id: $id, lines: $lines) {
+      checkout {
+        ...CartFields
       }
       errors {
         field
@@ -105,51 +75,14 @@ export const ADD_TO_CART_MUTATION = gql`
 `;
 
 export const UPDATE_CART_LINE_MUTATION = gql`
-  mutation UpdateCartLine($cartId: ID!, $lineId: ID!, $quantity: Int!) {
-    cartLinesUpdate(
-      cartId: $cartId
+  ${CART_FIELDS}
+  mutation UpdateCartLine($id: ID!, $lineId: ID!, $quantity: Int!) {
+    checkoutLinesUpdate(
+      id: $id
       lines: [{ lineId: $lineId, quantity: $quantity }]
     ) {
-      cart {
-        id
-        lines {
-          id
-          quantity
-          variant {
-            id
-            name
-            sku
-            product {
-              id
-              name
-              slug
-              thumbnail {
-                url
-                alt
-              }
-            }
-            pricing {
-              price {
-                gross {
-                  amount
-                  currency
-                }
-              }
-            }
-          }
-        }
-        subtotal {
-          gross {
-            amount
-            currency
-          }
-        }
-        total {
-          gross {
-            amount
-            currency
-          }
-        }
+      checkout {
+        ...CartFields
       }
       errors {
         field
@@ -160,48 +93,11 @@ export const UPDATE_CART_LINE_MUTATION = gql`
 `;
 
 export const REMOVE_CART_LINE_MUTATION = gql`
-  mutation RemoveCartLine($cartId: ID!, $lineId: ID!) {
-    cartLinesRemove(cartId: $cartId, lines: [$lineId]) {
-      cart {
-        id
-        lines {
-          id
-          quantity
-          variant {
-            id
-            name
-            sku
-            product {
-              id
-              name
-              slug
-              thumbnail {
-                url
-                alt
-              }
-            }
-            pricing {
-              price {
-                gross {
-                  amount
-                  currency
-                }
-              }
-            }
-          }
-        }
-        subtotal {
-          gross {
-            amount
-            currency
-          }
-        }
-        total {
-          gross {
-            amount
-            currency
-          }
-        }
+  ${CART_FIELDS}
+  mutation RemoveCartLine($id: ID!, $lineId: ID!) {
+    checkoutLinesDelete(id: $id, linesIds: [$lineId]) {
+      checkout {
+        ...CartFields
       }
       errors {
         field
@@ -212,47 +108,10 @@ export const REMOVE_CART_LINE_MUTATION = gql`
 `;
 
 export const GET_CART_QUERY = gql`
+  ${CART_FIELDS}
   query GetCart($cartId: ID!) {
-    cart(id: $cartId) {
-      id
-      lines {
-        id
-        quantity
-        variant {
-          id
-          name
-          sku
-          product {
-            id
-            name
-            slug
-            thumbnail {
-              url
-              alt
-            }
-          }
-          pricing {
-            price {
-              gross {
-                amount
-                currency
-              }
-            }
-          }
-        }
-      }
-      subtotal {
-        gross {
-          amount
-          currency
-        }
-      }
-      total {
-        gross {
-          amount
-          currency
-        }
-      }
+    checkout(id: $cartId) {
+      ...CartFields
     }
   }
 `;

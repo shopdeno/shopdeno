@@ -19,7 +19,7 @@ export default async function CheckoutPage() {
 
   try {
     const result = await client.query(GET_CART_QUERY, { cartId });
-    const cart = result.data?.cart;
+    const cart = result.data?.checkout;
 
     if (!cart || cart.lines.length === 0) {
       redirect("/");

@@ -63,7 +63,7 @@ export const GET_CHECKOUT_QUERY = gql`
           }
         }
       }
-      subtotal {
+      subtotal: subtotalPrice {
         gross {
           amount
           currency
@@ -75,7 +75,7 @@ export const GET_CHECKOUT_QUERY = gql`
           currency
         }
       }
-      total {
+      total: totalPrice {
         gross {
           amount
           currency

@@ -95,8 +95,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const result = await saleorClient.mutation(CREATE_CART_MUTATION, {
       channel: CHANNEL,
     });
-    if (result.data?.cartCreate?.cart) {
-      const newCart = result.data.cartCreate.cart;
+    if (result.data?.checkoutCreate?.checkout) {
+      const newCart = result.data.checkoutCreate.checkout;
       if (typeof window !== "undefined") {
         localStorage.setItem("cartId", newCart.id);
       }
@@ -107,7 +107,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const fetchCart = useCallback(async (cartId: string) => {
     const result = await saleorClient.query(GET_CART_QUERY, { cartId });
-    return result.data?.cart || null;
+    return result.data?.checkout || null;
   }, []);
 
   useEffect(() => {
@@ -140,12 +140,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       try {
         const result = await saleorClient.mutation(ADD_TO_CART_MUTATION, {
-          cartId: cart.id,
+          id: cart.id,
           lines: [{ variantId, quantity }],
         });
 
-        if (result.data?.cartLinesAdd?.cart) {
-          setCart(result.data.cartLinesAdd.cart);
+        if (result.data?.checkoutLinesAdd?.checkout) {
+          setCart(result.data.checkoutLinesAdd.checkout);
           openCart();
         }
       } finally {
@@ -162,13 +162,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       try {
         const result = await saleorClient.mutation(UPDATE_CART_LINE_MUTATION, {
-          cartId: cart.id,
+          id: cart.id,
           lineId,
           quantity,
         });
 
-        if (result.data?.cartLinesUpdate?.cart) {
-          setCart(result.data.cartLinesUpdate.cart);
+        if (result.data?.checkoutLinesUpdate?.checkout) {
+          setCart(result.data.checkoutLinesUpdate.checkout);
         }
       } finally {
         setIsLoading(false);
@@ -184,12 +184,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       try {
         const result = await saleorClient.mutation(REMOVE_CART_LINE_MUTATION, {
-          cartId: cart.id,
+          id: cart.id,
           lineId,
         });
 
-        if (result.data?.cartLinesRemove?.cart) {
-          setCart(result.data.cartLinesRemove.cart);
+        if (result.data?.checkoutLinesDelete?.checkout) {
+          setCart(result.data.checkoutLinesDelete.checkout);
         }
       } finally {
         setIsLoading(false);
