@@ -86,6 +86,7 @@ interface Variant {
   id: string;
   name: string;
   sku: string;
+  quantityAvailable?: number;
   media?: { id: string; url: string; alt?: string }[];
   attributes: Attribute[];
   pricing: {
@@ -258,7 +259,8 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
         return attr.values?.some((val) => val.slug === selectedValue);
       })
     );
-    setSelectedVariant(variant || null);
+    // Fall back to first variant rather than clearing selection if no attribute match
+    setSelectedVariant(variant ?? product.variants[0] ?? null);
   }, [selectedAttributes, product.variants]);
 
   useEffect(() => {
@@ -531,21 +533,26 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
 
             {/* CTA row */}
             <div className="mt-6 flex gap-3">
-              <button
-                onClick={handleAddToCart}
-                disabled={!product.isAvailableForPurchase || !selectedVariant || isLoading}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full border border-transparent bg-gray-900 px-8 py-3.5 text-base font-medium text-white hover:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : !product.isAvailableForPurchase ? (
-                  "Out of Stock"
-                ) : !selectedVariant ? (
-                  "Select Options"
-                ) : (
-                  <><ShoppingCart className="h-5 w-5" /><span>Add to cart</span></>
-                )}
-              </button>
+              {(() => {
+                const isVariantInStock = !selectedVariant || (selectedVariant.quantityAvailable ?? 1) > 0;
+                return (
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={!product.isAvailableForPurchase || !selectedVariant || !isVariantInStock || isLoading}
+                    className="flex-1 flex items-center justify-center gap-2 rounded-full border border-transparent bg-gray-900 px-8 py-3.5 text-base font-medium text-white hover:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : !product.isAvailableForPurchase || !isVariantInStock ? (
+                      "Out of Stock"
+                    ) : !selectedVariant ? (
+                      "Select Options"
+                    ) : (
+                      <><ShoppingCart className="h-5 w-5" /><span>Add to cart</span></>
+                    )}
+                  </button>
+                );
+              })()}
               <button
                 onClick={toggleWishlist}
                 className={`flex items-center justify-center gap-2 rounded-full border px-5 py-3.5 text-sm font-medium transition-colors ${
@@ -914,7 +921,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
             </div>
             <button
               onClick={handleAddToCart}
-              disabled={!product.isAvailableForPurchase || !selectedVariant || isLoading}
+              disabled={!product.isAvailableForPurchase || !selectedVariant || (selectedVariant.quantityAvailable ?? 1) === 0 || isLoading}
               className="rounded-full bg-gray-900 px-6 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:bg-gray-300 transition-colors"
             >
               {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Add to Cart"}

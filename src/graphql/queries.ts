@@ -199,6 +199,7 @@ export const PRODUCT_DETAIL_QUERY = gql`
         id
         name
         sku
+        quantityAvailable
         media {
           id
           url
