@@ -254,9 +254,11 @@ export const CHECKOUT_COMPLETE_MUTATION = gql`
 
 export const GET_COUNTRIES_QUERY = gql`
   query GetCountries {
-    countries {
-      code
-      country
+    shop {
+      countries {
+        code
+        country
+      }
     }
   }
 `;

@@ -6,7 +6,7 @@ import { GET_COUNTRIES_QUERY } from "@/graphql/checkout";
 export default async function CheckoutPage() {
   const client = getSaleorClient();
   const result = await client.query(GET_COUNTRIES_QUERY, {});
-  const countries: { code: string; country: string }[] = result.data?.countries ?? [];
+  const countries: { code: string; country: string }[] = result.data?.shop?.countries ?? [];
 
   return (
     <CheckoutProvider>
