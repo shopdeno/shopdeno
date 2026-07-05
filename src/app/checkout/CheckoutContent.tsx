@@ -262,7 +262,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
             {step === "information" && deliveryIntent === "collect" && (
               <form onSubmit={handleCollectSubmit}>
                 <h2 className="text-lg font-medium text-gray-900 mb-1">Contact Information</h2>
-                <p className="text-sm text-gray-500 mb-4">We'll contact you when your order is ready.</p>
+                <p className="text-sm text-gray-500 mb-4">We&apos;ll contact you when your order is ready.</p>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                   <input
