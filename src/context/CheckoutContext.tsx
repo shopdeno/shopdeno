@@ -94,7 +94,7 @@ interface CheckoutContextType {
   setStep: (step: "information" | "shipping" | "payment" | "review") => void;
   paymentMethod: PaymentMethod;
   setPaymentMethod: (method: PaymentMethod) => void;
-  updateAddress: (address: Address, type: "shipping" | "billing") => Promise<void>;
+  updateAddress: (address: Address, type: "shipping" | "billing", opts?: { skipStepChange?: boolean }) => Promise<Checkout | null>;
   updateEmail: (email: string) => Promise<void>;
   updateDeliveryMethod: (methodId: string) => Promise<void>;
   completeCheckout: () => Promise<{ orderId?: string; redirectUrl?: string; error?: string }>;
@@ -143,8 +143,8 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
   }, [fetchCheckout]);
 
   const updateAddress = useCallback(
-    async (address: Address, _type: "shipping" | "billing") => {
-      if (!checkout) return;
+    async (address: Address, _type: "shipping" | "billing", opts?: { skipStepChange?: boolean }): Promise<Checkout | null> => {
+      if (!checkout) return null;
       setIsLoading(true);
 
       try {
@@ -174,16 +174,18 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         ];
         if (errors.length) {
           console.error("Error updating address:", errors);
-          return;
+          return null;
         }
 
         // Re-fetch to hydrate delivery methods/collection points now available
         // for the entered address.
         const fresh = await fetchCheckout(checkout.id);
         if (fresh) setCheckout(fresh);
-        setStep("shipping");
+        if (!opts?.skipStepChange) setStep("shipping");
+        return fresh;
       } catch (error) {
         console.error("Error updating address:", error);
+        return null;
       } finally {
         setIsLoading(false);
       }

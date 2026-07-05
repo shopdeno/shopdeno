@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCheckout, type Address } from "@/context/CheckoutContext";
 import { siteConfig } from "@/lib/site-config";
-import { Check, Loader2, ChevronLeft } from "lucide-react";
+import { Check, Loader2, ChevronLeft, Building2, Truck } from "lucide-react";
 
 interface Cart {
   id: string;
@@ -56,9 +56,11 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
     country: { code: "US", country: "United States" },
     phone: "",
   });
+  const [deliveryIntent, setDeliveryIntent] = useState<"collect" | "ship" | null>(null);
   const [sameAsBilling, setSameAsBilling] = useState(true);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [orderIsCollect, setOrderIsCollect] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const formatPrice = (amount: number, currency: string) => {
@@ -80,6 +82,29 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
     setStep("payment");
   };
 
+  const handleCollectSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await updateEmail(email);
+    const studioAddress: Address = {
+      firstName: address.firstName,
+      lastName: address.lastName,
+      streetAddress1: "Likoni Ln, Likoni Cl, off Denis Pritt Rd, Hurlingham",
+      city: "Nairobi",
+      postalCode: "00100",
+      country: { code: "KE", country: "Kenya" },
+      phone: address.phone || undefined,
+    };
+    const fresh = await updateAddress(studioAddress, "shipping", { skipStepChange: true });
+    const collectionPoint = fresh?.availableCollectionPoints?.[0];
+    if (collectionPoint) {
+      await updateDeliveryMethod(collectionPoint.id);
+      // updateDeliveryMethod already calls setStep("payment")
+    } else {
+      // fallback: go to shipping step so user can pick manually
+      setStep("shipping");
+    }
+  };
+
   const [orderError, setOrderError] = useState<string | null>(null);
 
   const handleCompleteOrder = async () => {
@@ -88,6 +113,7 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
     if (result.orderId) {
       setOrderComplete(true);
       setOrderId(result.orderId);
+      setOrderIsCollect(checkout?.deliveryMethod?.__typename === "Warehouse");
     } else if (result.redirectUrl) {
       // PesaPal / PayPal: hand off to the gateway; return handled by /checkout/return.
       window.location.assign(result.redirectUrl);
@@ -104,9 +130,27 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
             <Check className="h-8 w-8 text-green-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-4">
             Thank you for your order. Your order number is: {orderId}
           </p>
+          {orderIsCollect && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6 text-left">
+              <p className="font-medium text-green-900 mb-1">Ready for studio collection</p>
+              <p className="text-sm text-green-800">{siteConfig.studio.name}</p>
+              <p className="text-sm text-green-700 mb-2">{siteConfig.studio.address}</p>
+              <a
+                href={siteConfig.studio.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-indigo-600 underline"
+              >
+                View on Google Maps
+              </a>
+              <p className="text-sm text-green-700 mt-2">
+                Contact: <a href={`tel:${siteConfig.contact.phone}`} className="underline">{siteConfig.contact.phoneDisplay}</a>
+              </p>
+            </div>
+          )}
           <Link
             href="/"
             className="inline-block w-full bg-indigo-600 text-white py-3 rounded-md hover:bg-indigo-700"
@@ -138,10 +182,14 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
               <span className={step === "information" ? "text-indigo-600 font-medium" : "text-gray-500"}>
                 Information
               </span>
-              <span className="text-gray-400">→</span>
-              <span className={step === "shipping" ? "text-indigo-600 font-medium" : "text-gray-500"}>
-                Shipping
-              </span>
+              {deliveryIntent !== "collect" && (
+                <>
+                  <span className="text-gray-400">→</span>
+                  <span className={step === "shipping" ? "text-indigo-600 font-medium" : "text-gray-500"}>
+                    Shipping
+                  </span>
+                </>
+              )}
               <span className="text-gray-400">→</span>
               <span className={step === "payment" ? "text-indigo-600 font-medium" : "text-gray-500"}>
                 Payment
@@ -155,14 +203,134 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
           <div className="lg:col-span-7">
             <button
-              onClick={() => step !== "information" ? setStep(step === "payment" ? "shipping" : "information") : undefined}
+              onClick={() => {
+                if (step === "payment" && deliveryIntent === "collect") {
+                  setDeliveryIntent(null);
+                  setStep("information");
+                } else if (step === "payment") {
+                  setStep("shipping");
+                } else if (step === "shipping") {
+                  setStep("information");
+                } else if (deliveryIntent !== null) {
+                  setDeliveryIntent(null);
+                }
+              }}
               className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-6"
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
-              {step === "payment" ? "Shipping" : step === "shipping" ? "Information" : "Cart"}
+              {step === "payment" && deliveryIntent === "collect" ? "Change delivery" :
+               step === "payment" ? "Shipping" :
+               step === "shipping" ? "Information" :
+               deliveryIntent ? "Change delivery" : "Cart"}
             </button>
 
-            {step === "information" && (
+            {step === "information" && deliveryIntent === null && (
+              <div>
+                <h2 className="text-lg font-medium text-gray-900 mb-2">How would you like to receive your order?</h2>
+                <p className="text-sm text-gray-500 mb-6">Choose delivery or free studio collection in Nairobi.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setDeliveryIntent("collect")}
+                    className="flex flex-col items-start p-5 border-2 border-green-500 rounded-lg hover:border-green-600 hover:bg-green-50 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <Building2 className="h-5 w-5 text-green-600" />
+                      <span className="font-semibold text-gray-900">Collect at studio</span>
+                      <span className="ml-auto text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Free</span>
+                    </div>
+                    <p className="text-sm text-gray-600">{siteConfig.studio.name}</p>
+                    <p className="text-xs text-gray-400 mt-1">Hurlingham, Nairobi</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setDeliveryIntent("ship")}
+                    className="flex flex-col items-start p-5 border-2 border-gray-200 rounded-lg hover:border-indigo-400 hover:bg-indigo-50 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <Truck className="h-5 w-5 text-indigo-500" />
+                      <span className="font-semibold text-gray-900">Ship to address</span>
+                    </div>
+                    <p className="text-sm text-gray-600">Kenya, UK, US & international</p>
+                    <p className="text-xs text-gray-400 mt-1">Rates calculated at checkout</p>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {step === "information" && deliveryIntent === "collect" && (
+              <form onSubmit={handleCollectSubmit}>
+                <h2 className="text-lg font-medium text-gray-900 mb-1">Contact Information</h2>
+                <p className="text-sm text-gray-500 mb-4">We'll contact you when your order is ready.</p>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="your@email.com"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={address.firstName}
+                      onChange={(e) => setAddress({ ...address, firstName: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={address.lastName}
+                      onChange={(e) => setAddress({ ...address, lastName: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone (optional)</label>
+                  <input
+                    type="tel"
+                    value={address.phone || ""}
+                    onChange={(e) => setAddress({ ...address, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+                <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-md mb-6">
+                  <Building2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-green-900">{siteConfig.studio.name}</p>
+                    <p className="text-sm text-green-700">{siteConfig.studio.address}</p>
+                    <a
+                      href={siteConfig.studio.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-indigo-600 underline mt-1 inline-block"
+                    >
+                      View on Google Maps
+                    </a>
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-indigo-600 text-white py-3 rounded-md hover:bg-indigo-700 disabled:bg-gray-300 flex items-center justify-center"
+                >
+                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Continue to Payment"}
+                </button>
+              </form>
+            )}
+
+            {step === "information" && deliveryIntent === "ship" && (
               <form onSubmit={handleEmailSubmit}>
                 <h2 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h2>
                 <div className="mb-6">
@@ -273,6 +441,7 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
                     onChange={(e) => setAddress({ ...address, country: { code: e.target.value, country: e.target.value } })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                   >
+                    <option value="KE">Kenya</option>
                     <option value="US">United States</option>
                     <option value="GB">United Kingdom</option>
                     <option value="CA">Canada</option>
@@ -410,26 +579,41 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
                       Change
                     </button>
                   </div>
-                  <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between">
-                    <div>
-                      <p className="font-medium">Ship to</p>
-                      <p className="text-gray-600">
-                        {checkout.shippingAddress?.streetAddress1}, {checkout.shippingAddress?.city}
-                      </p>
+                  {checkout.deliveryMethod?.__typename === "Warehouse" ? (
+                    <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between">
+                      <div>
+                        <p className="font-medium">Collect at</p>
+                        <p className="text-gray-600 text-sm">{siteConfig.studio.name}</p>
+                        <p className="text-gray-500 text-xs">Hurlingham, Nairobi · Free</p>
+                      </div>
+                      <button type="button" onClick={() => { setDeliveryIntent(null); setStep("information"); }} className="text-indigo-600 text-sm">
+                        Change
+                      </button>
                     </div>
-                    <button type="button" onClick={() => setStep("information")} className="text-indigo-600 text-sm">
-                      Change
-                    </button>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between">
-                    <div>
-                      <p className="font-medium">Method</p>
-                      <p className="text-gray-600">{checkout.deliveryMethod?.name}</p>
-                    </div>
-                    <button type="button" onClick={() => setStep("shipping")} className="text-indigo-600 text-sm">
-                      Change
-                    </button>
-                  </div>
+                  ) : (
+                    <>
+                      <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between">
+                        <div>
+                          <p className="font-medium">Ship to</p>
+                          <p className="text-gray-600">
+                            {checkout.shippingAddress?.streetAddress1}, {checkout.shippingAddress?.city}
+                          </p>
+                        </div>
+                        <button type="button" onClick={() => setStep("information")} className="text-indigo-600 text-sm">
+                          Change
+                        </button>
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between">
+                        <div>
+                          <p className="font-medium">Method</p>
+                          <p className="text-gray-600">{checkout.deliveryMethod?.name}</p>
+                        </div>
+                        <button type="button" onClick={() => setStep("shipping")} className="text-indigo-600 text-sm">
+                          Change
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <h2 className="text-lg font-medium text-gray-900 mb-4">Payment</h2>
