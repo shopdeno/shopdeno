@@ -14,7 +14,7 @@ interface Cart {
   subtotal: { gross: { amount: number; currency: string } };
 }
 
-export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
+export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Cart; countries?: { code: string; country: string }[] }) {
   const router = useRouter();
   const {
     checkout,
@@ -441,13 +441,18 @@ export function CheckoutContent({ cart: cartProp }: { cart?: Cart }) {
                     onChange={(e) => setAddress({ ...address, country: { code: e.target.value, country: e.target.value } })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                   >
-                    <option value="KE">Kenya</option>
-                    <option value="US">United States</option>
-                    <option value="GB">United Kingdom</option>
-                    <option value="CA">Canada</option>
-                    <option value="AU">Australia</option>
-                    <option value="DE">Germany</option>
-                    <option value="FR">France</option>
+                    {countries.length > 0
+                      ? countries.map((c) => (
+                          <option key={c.code} value={c.code}>{c.country}</option>
+                        ))
+                      : (
+                        <>
+                          <option value="KE">Kenya</option>
+                          <option value="US">United States</option>
+                          <option value="GB">United Kingdom</option>
+                        </>
+                      )
+                    }
                   </select>
                 </div>
 
