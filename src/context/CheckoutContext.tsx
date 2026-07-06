@@ -221,9 +221,8 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
           console.error("Error updating billing address:", JSON.stringify(errors));
           return null;
         }
-        const fresh = await fetchCheckout(checkout.id);
-        if (fresh) setCheckout(fresh);
-        return fresh;
+        // Return current checkout — no refetch needed; delivery method update will refresh state.
+        return checkout;
       } catch (error) {
         console.error("Error updating billing address:", error);
         return null;
@@ -271,8 +270,14 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         });
 
         if (result.data?.checkoutDeliveryMethodUpdate?.checkout) {
+          // Prefer fetching full checkout; fall back to merging mutation response
+          // so deliveryMethod is set even when refetch fails (e.g. 400 on stale token).
           const fresh = await fetchCheckout(checkout.id);
-          if (fresh) setCheckout(fresh);
+          if (fresh) {
+            setCheckout(fresh);
+          } else {
+            setCheckout((prev) => prev ? { ...prev, ...result.data.checkoutDeliveryMethodUpdate.checkout } : prev);
+          }
           setStep("payment");
         } else if (result.data?.checkoutDeliveryMethodUpdate?.errors?.length) {
           console.error(
