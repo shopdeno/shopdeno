@@ -11,6 +11,7 @@
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.2.0",
     "@saleor/auth-sdk": "^1.0.3",
+    "@vercel/analytics": "^2.0.1",
     "babel-plugin-graphql-tag": "^3.3.0",
     "graphql": "^16.13.0",
     "graphql-tag": "^2.12.6",

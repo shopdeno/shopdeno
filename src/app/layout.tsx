@@ -9,6 +9,7 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { getSaleorClient, getChannel } from "@/lib/saleor";
 import { MAIN_MENU_QUERY } from "@/graphql/queries";
 import { siteConfig } from "@/lib/site-config";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -142,6 +143,7 @@ export default async function RootLayout({
           <CartDrawer />
           <CookieConsent />
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
