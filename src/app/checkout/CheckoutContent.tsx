@@ -25,6 +25,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
     paymentMethod,
     setPaymentMethod,
     updateAddress,
+    updateBillingAddress,
     updateEmail,
     updateDeliveryMethod,
     completeCheckout,
@@ -94,8 +95,9 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
       country: { code: "KE", country: "Kenya" },
       phone: address.phone || undefined,
     };
-    // Set billing address (don't block flow on failure — delivery method is set by warehouse ID)
-    await updateAddress(studioAddress, "shipping", { skipStepChange: true });
+    // Set billing address only — shipping address update is skipped for collect
+    // because the KE studio address fails Saleor shipping zone validation.
+    await updateBillingAddress(studioAddress);
     // Use the known warehouse ID directly; avoids dependence on availableCollectionPoints
     // which only appears after address+zone matching (LOCAL option). The warehouse is
     // linked to default-channel so checkoutDeliveryMethodUpdate accepts it regardless.

@@ -117,9 +117,31 @@ export const GET_CHECKOUT_QUERY = gql`
 `;
 
 // Sets both shipping and billing to the same address in one round-trip. The
+export const UPDATE_CHECKOUT_BILLING_ONLY_MUTATION = gql`
+  mutation UpdateCheckoutBillingOnly($checkoutId: ID!, $address: AddressInput!) {
+    checkoutBillingAddressUpdate(
+      checkoutId: $checkoutId
+      billingAddress: $address
+    ) {
+      checkout {
+        id
+        billingAddress {
+          city
+          countryArea
+          postalCode
+        }
+      }
+      errors {
+        field
+        message
+      }
+    }
+  }
+`;
+
 // storefront collects a single address; Saleor requires a billing address for
-// checkoutComplete, so we always mirror it. When shipping isn't required
-// (pickup-only cart) the shippingAddress update is a harmless no-op.
+// checkoutComplete, so we always mirror it. For shipping flows the address is
+// also set as shipping address. For collect flows use UPDATE_CHECKOUT_BILLING_ONLY_MUTATION.
 export const UPDATE_CHECKOUT_ADDRESS_MUTATION = gql`
   mutation UpdateCheckoutAddress($checkoutId: ID!, $address: AddressInput!) {
     checkoutShippingAddressUpdate(

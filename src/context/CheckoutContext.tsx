@@ -12,6 +12,7 @@ import { getSaleorClient } from "@/lib/saleor";
 import {
   GET_CHECKOUT_QUERY,
   UPDATE_CHECKOUT_ADDRESS_MUTATION,
+  UPDATE_CHECKOUT_BILLING_ONLY_MUTATION,
   UPDATE_CHECKOUT_EMAIL_MUTATION,
   UPDATE_DELIVERY_METHOD_MUTATION,
 } from "@/graphql/checkout";
@@ -95,6 +96,7 @@ interface CheckoutContextType {
   paymentMethod: PaymentMethod;
   setPaymentMethod: (method: PaymentMethod) => void;
   updateAddress: (address: Address, type: "shipping" | "billing", opts?: { skipStepChange?: boolean }) => Promise<Checkout | null>;
+  updateBillingAddress: (address: Address) => Promise<Checkout | null>;
   updateEmail: (email: string) => Promise<void>;
   updateDeliveryMethod: (methodId: string) => Promise<void>;
   completeCheckout: () => Promise<{ orderId?: string; redirectUrl?: string; error?: string }>;
@@ -185,6 +187,45 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         return fresh;
       } catch (error) {
         console.error("Error updating address:", error);
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [checkout, client, fetchCheckout]
+  );
+
+  const updateBillingAddress = useCallback(
+    async (address: Address): Promise<Checkout | null> => {
+      if (!checkout) return null;
+      setIsLoading(true);
+      try {
+        const addressInput = {
+          firstName: address.firstName,
+          lastName: address.lastName,
+          companyName: address.companyName || undefined,
+          streetAddress1: address.streetAddress1,
+          streetAddress2: address.streetAddress2 || undefined,
+          city: address.city,
+          countryArea: address.countryArea || undefined,
+          postalCode: address.postalCode,
+          country: address.country.code,
+          phone: address.phone || undefined,
+        };
+        const result = await client.mutation(UPDATE_CHECKOUT_BILLING_ONLY_MUTATION, {
+          checkoutId: checkout.id,
+          address: addressInput,
+        });
+        const errors = result.data?.checkoutBillingAddressUpdate?.errors ?? [];
+        if (errors.length) {
+          console.error("Error updating billing address:", errors);
+          return null;
+        }
+        const fresh = await fetchCheckout(checkout.id);
+        if (fresh) setCheckout(fresh);
+        return fresh;
+      } catch (error) {
+        console.error("Error updating billing address:", error);
         return null;
       } finally {
         setIsLoading(false);
@@ -299,6 +340,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         paymentMethod,
         setPaymentMethod,
         updateAddress,
+        updateBillingAddress,
         updateEmail,
         updateDeliveryMethod,
         completeCheckout,
