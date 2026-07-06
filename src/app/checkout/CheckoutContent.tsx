@@ -94,15 +94,13 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
       country: { code: "KE", country: "Kenya" },
       phone: address.phone || undefined,
     };
-    const fresh = await updateAddress(studioAddress, "shipping", { skipStepChange: true });
-    const collectionPoint = fresh?.availableCollectionPoints?.[0];
-    if (collectionPoint) {
-      await updateDeliveryMethod(collectionPoint.id);
-      // updateDeliveryMethod already calls setStep("payment")
-    } else {
-      // fallback: go to shipping step so user can pick manually
-      setStep("shipping");
-    }
+    // Set billing address (don't block flow on failure — delivery method is set by warehouse ID)
+    await updateAddress(studioAddress, "shipping", { skipStepChange: true });
+    // Use the known warehouse ID directly; avoids dependence on availableCollectionPoints
+    // which only appears after address+zone matching (LOCAL option). The warehouse is
+    // linked to default-channel so checkoutDeliveryMethodUpdate accepts it regardless.
+    await updateDeliveryMethod(siteConfig.studio.warehouseId);
+    // updateDeliveryMethod calls setStep("payment") on success
   };
 
   const [orderError, setOrderError] = useState<string | null>(null);

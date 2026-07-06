@@ -27,6 +27,8 @@ export const siteConfig = {
     mapsUrl:
       "https://www.google.com/maps/place/Kuona+Artists+collective,+Centre+for+the+Visual+Arts/@-1.284466,36.7888362,885m/data=!3m2!1e3!4b1!4m6!3m5!1s0x182f10ae9666a5f5:0x110f113782108cfb!8m2!3d-1.284466!4d36.7888362!16s%2Fg%2F1tdt3hvk",
     pickupNote: "Free collection/pickup available at the studio in Nairobi.",
+    // Saleor Cloud warehouse ID for the Kuona click-and-collect point
+    warehouseId: process.env.NEXT_PUBLIC_STUDIO_WAREHOUSE_ID || "V2FyZWhvdXNlOjAwNjQ1N2U3LWMzOTAtNDBkZC04NzljLTQ0Njc1ZmIxYTVjYw==",
   },
   social: {
     facebook: "https://www.facebook.com/muraguridenis/",
