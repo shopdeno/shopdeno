@@ -86,6 +86,15 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
   const handleCollectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await updateEmail(email);
+    const rawPhone = address.phone?.trim() || "";
+    // Saleor requires E.164. Kenyan numbers starting with 07/01 → +2547/+2541.
+    const phone = rawPhone
+      ? rawPhone.startsWith("+")
+        ? rawPhone
+        : rawPhone.startsWith("0")
+        ? "+254" + rawPhone.slice(1)
+        : "+" + rawPhone
+      : undefined;
     const studioAddress: Address = {
       firstName: address.firstName,
       lastName: address.lastName,
@@ -93,7 +102,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
       city: "Nairobi",
       postalCode: "00100",
       country: { code: "KE", country: "Kenya" },
-      phone: address.phone || undefined,
+      phone,
     };
     // Set billing address only — shipping update skipped (no KE shipping zone).
     const billingOk = await updateBillingAddress(studioAddress);
