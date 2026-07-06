@@ -104,15 +104,14 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
       country: { code: "KE", country: "Kenya" },
       phone,
     };
-    // Set billing address only — shipping update skipped (no KE shipping zone).
+    // Billing-only update — shipping update skipped (no KE shipping zone on Saleor Cloud).
     const billingOk = await updateBillingAddress(studioAddress);
     if (!billingOk) {
       console.error("Billing address update failed — aborting collect flow");
       return;
     }
-    // Use the known warehouse ID directly; avoids dependence on availableCollectionPoints.
+    // Use Saleor Cloud "Default" warehouse for click-and-collect.
     await updateDeliveryMethod(siteConfig.studio.warehouseId);
-    // updateDeliveryMethod calls setStep("payment") on success
   };
 
   const [orderError, setOrderError] = useState<string | null>(null);
