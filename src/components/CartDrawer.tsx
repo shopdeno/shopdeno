@@ -30,7 +30,7 @@ export function CartDrawer() {
           <div className="flex h-full flex-col bg-white shadow-xl">
             <div className="flex items-center justify-between px-4 py-6 sm:px-6">
               <h2 className="text-lg font-medium text-gray-900">
-                Shopping Cart ({cart?.lines.length || 0})
+                Shopping Cart ({cart?.lines.reduce((sum, line) => sum + line.quantity, 0) || 0})
               </h2>
               <button
                 onClick={closeCart}
@@ -86,7 +86,7 @@ export function CartDrawer() {
                               </div>
                               <p className="text-sm font-medium">
                                 {formatPrice(
-                                  line.variant.pricing.price.gross.amount,
+                                  line.variant.pricing.price.gross.amount * line.quantity,
                                   line.variant.pricing.price.gross.currency
                                 )}
                               </p>
