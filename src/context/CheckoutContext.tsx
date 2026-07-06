@@ -218,7 +218,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         });
         const errors = result.data?.checkoutBillingAddressUpdate?.errors ?? [];
         if (errors.length) {
-          console.error("Error updating billing address:", errors);
+          console.error("Error updating billing address:", JSON.stringify(errors));
           return null;
         }
         const fresh = await fetchCheckout(checkout.id);

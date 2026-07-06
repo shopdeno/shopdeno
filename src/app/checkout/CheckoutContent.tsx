@@ -89,18 +89,19 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
     const studioAddress: Address = {
       firstName: address.firstName,
       lastName: address.lastName,
-      streetAddress1: "Likoni Ln, Likoni Cl, off Denis Pritt Rd, Hurlingham",
+      streetAddress1: "Likoni Lane, Hurlingham",
       city: "Nairobi",
       postalCode: "00100",
       country: { code: "KE", country: "Kenya" },
       phone: address.phone || undefined,
     };
-    // Set billing address only — shipping address update is skipped for collect
-    // because the KE studio address fails Saleor shipping zone validation.
-    await updateBillingAddress(studioAddress);
-    // Use the known warehouse ID directly; avoids dependence on availableCollectionPoints
-    // which only appears after address+zone matching (LOCAL option). The warehouse is
-    // linked to default-channel so checkoutDeliveryMethodUpdate accepts it regardless.
+    // Set billing address only — shipping update skipped (no KE shipping zone).
+    const billingOk = await updateBillingAddress(studioAddress);
+    if (!billingOk) {
+      console.error("Billing address update failed — aborting collect flow");
+      return;
+    }
+    // Use the known warehouse ID directly; avoids dependence on availableCollectionPoints.
     await updateDeliveryMethod(siteConfig.studio.warehouseId);
     // updateDeliveryMethod calls setStep("payment") on success
   };
