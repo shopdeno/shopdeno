@@ -63,6 +63,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
   const [orderId, setOrderId] = useState<string | null>(null);
   const [orderIsCollect, setOrderIsCollect] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [pesapalIframeUrl, setPesapalIframeUrl] = useState<string | null>(null);
 
   const formatPrice = (amount: number, currency: string) => {
     return new Intl.NumberFormat("en-US", {
@@ -124,8 +125,12 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
       setOrderId(result.orderId);
       setOrderIsCollect(checkout?.deliveryMethod?.__typename === "Warehouse");
     } else if (result.redirectUrl) {
-      // PesaPal / PayPal: hand off to the gateway; return handled by /checkout/return.
-      window.location.assign(result.redirectUrl);
+      if (paymentMethod === "pesapal") {
+        setPesapalIframeUrl(result.redirectUrl);
+      } else {
+        // PayPal: open gateway in new tab; return handled by /checkout/return.
+        window.open(result.redirectUrl, "_blank", "noopener,noreferrer");
+      }
     } else if (result.error) {
       setOrderError(result.error);
     }
@@ -663,6 +668,18 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                       </span>
                     </span>
                   </label>
+
+                  {paymentMethod === "pesapal" && pesapalIframeUrl && (
+                    <div className="border border-gray-200 rounded-md overflow-hidden bg-white">
+                      <iframe
+                        src={pesapalIframeUrl}
+                        width="100%"
+                        height="600"
+                        title="PesaPal Payment"
+                        style={{ border: "none", display: "block" }}
+                      />
+                    </div>
+                  )}
 
                   <label className="flex items-start p-4 border border-gray-200 rounded-md cursor-pointer hover:border-indigo-500">
                     <input

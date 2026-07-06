@@ -136,12 +136,10 @@ export function CartDrawer() {
                   <div className="flex justify-between text-base font-medium text-gray-900">
                     <p>Subtotal</p>
                     <p>
-                      {cart?.subtotal
-                        ? formatPrice(
-                            cart.subtotal.gross.amount,
-                            cart.subtotal.gross.currency
-                          )
-                        : formatPrice(0, "USD")}
+                      {formatPrice(
+                        cart?.lines.reduce((sum, line) => sum + line.variant.pricing.price.gross.amount * line.quantity, 0) ?? 0,
+                        cart?.lines[0]?.variant.pricing.price.gross.currency ?? "USD"
+                      )}
                     </p>
                   </div>
                   <p className="mt-0.5 text-sm text-gray-500">

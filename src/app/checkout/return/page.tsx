@@ -14,6 +14,14 @@ function CheckoutReturn() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Break out of PesaPal iframe — when PesaPal redirects to callback_url inside
+    // the iframe, promote the return URL to the top-level window so the full page
+    // handles the confirmation, not a nested frame.
+    if (typeof window !== "undefined" && window !== window.top) {
+      window.top!.location.href = window.location.href;
+      return;
+    }
+
     const provider = searchParams.get("provider");
     const paypalOrderId = searchParams.get("token"); // PayPal appends ?token=
     const cancelled = searchParams.get("cancelled");
