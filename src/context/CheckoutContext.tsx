@@ -269,6 +269,9 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
           deliveryMethodId: methodId,
         });
 
+        if (result.error) {
+          console.error("Delivery method HTTP error:", JSON.stringify(result.error));
+        }
         if (result.data?.checkoutDeliveryMethodUpdate?.checkout) {
           // Prefer fetching full checkout; fall back to merging mutation response
           // so deliveryMethod is set even when refetch fails (e.g. 400 on stale token).
@@ -282,8 +285,10 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         } else if (result.data?.checkoutDeliveryMethodUpdate?.errors?.length) {
           console.error(
             "Delivery method error:",
-            result.data.checkoutDeliveryMethodUpdate.errors
+            JSON.stringify(result.data.checkoutDeliveryMethodUpdate.errors)
           );
+        } else if (!result.error) {
+          console.error("Delivery method: no data and no error — result:", JSON.stringify(result));
         }
       } catch (error) {
         console.error("Error updating delivery method:", error);
