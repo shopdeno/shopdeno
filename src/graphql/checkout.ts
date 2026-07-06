@@ -231,7 +231,7 @@ export const UPDATE_DELIVERY_METHOD_MUTATION = gql`
             currency
           }
         }
-        total {
+        totalPrice {
           gross {
             amount
             currency
