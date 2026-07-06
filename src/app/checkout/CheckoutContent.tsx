@@ -742,29 +742,39 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                 ))}
               </ul>
 
-              <div className="space-y-2 border-t border-gray-200 pt-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">
-                    {formatPrice(cart!.subtotal.gross.amount, cart!.subtotal.gross.currency)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">
-                    {checkout?.shippingPrice ? formatPrice(checkout.shippingPrice.gross.amount, checkout.shippingPrice.gross.currency) : "Calculated at next step"}
-                  </span>
-                </div>
-                <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-200">
-                  <span>Total</span>
-                  <span>
-                    {formatPrice(
-                      (checkout?.total?.gross?.amount || cart!.subtotal.gross.amount),
-                      (checkout?.total?.gross?.currency || cart!.subtotal.gross.currency)
-                    )}
-                  </span>
-                </div>
-              </div>
+              {(() => {
+                const lines = cart?.lines ?? [];
+                const linesSubtotal = lines.reduce(
+                  (sum, line: any) => sum + line.variant.pricing.price.gross.amount * line.quantity,
+                  0
+                );
+                const linesCurrency = (lines[0] as any)?.variant?.pricing?.price?.gross?.currency ?? "USD";
+                const isCollect = checkout?.deliveryMethod?.__typename === "Warehouse";
+                const shippingAmount = checkout?.shippingPrice?.gross?.amount ?? 0;
+                const computedTotal = linesSubtotal + shippingAmount;
+                return (
+                  <div className="space-y-2 border-t border-gray-200 pt-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Subtotal</span>
+                      <span className="font-medium">{formatPrice(linesSubtotal, linesCurrency)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Shipping</span>
+                      <span className="font-medium">
+                        {isCollect
+                          ? "Free"
+                          : checkout?.shippingPrice
+                            ? formatPrice(shippingAmount, checkout.shippingPrice.gross.currency)
+                            : "Calculated at next step"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-200">
+                      <span>Total</span>
+                      <span>{formatPrice(computedTotal, linesCurrency)}</span>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
