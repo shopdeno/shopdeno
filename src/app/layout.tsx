@@ -10,6 +10,7 @@ import { getSaleorClient, getChannel } from "@/lib/saleor";
 import { MAIN_MENU_QUERY } from "@/graphql/queries";
 import { siteConfig } from "@/lib/site-config";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -144,6 +145,7 @@ export default async function RootLayout({
           <CookieConsent />
         </Providers>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
