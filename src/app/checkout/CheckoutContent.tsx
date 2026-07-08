@@ -5,8 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCheckout, type Address } from "@/context/CheckoutContext";
+import { PhoneInput } from "@/components/PhoneInput";
 import { siteConfig } from "@/lib/site-config";
 import { Check, Loader2, ChevronLeft, Building2, Truck } from "lucide-react";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 interface Cart {
   id: string;
@@ -84,43 +86,17 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
     setStep("payment");
   };
 
-  // Map country codes to phone prefixes for E.164 normalization
-  const countryPhonePrefixes: Record<string, string> = {
-    KE: "254", // Kenya
-    IE: "353", // Ireland
-    GB: "44",  // United Kingdom
-    US: "1",   // United States
-    ZA: "27",  // South Africa
-  };
-
-  const normalizePhoneForCountry = (rawPhone: string, countryCode: string): string | undefined => {
-    if (!rawPhone.trim()) return undefined;
-    const phone = rawPhone.trim();
-    if (phone.startsWith("+")) return phone;
-
-    const prefix = countryPhonePrefixes[countryCode];
-    if (!prefix) {
-      // Unknown country — try to guess from leading 0
-      return phone.startsWith("0") ? "+" + phone.slice(1) : "+" + phone;
-    }
-
-    // Remove leading 0 if present, then prepend country code
-    const digits = phone.startsWith("0") ? phone.slice(1) : phone;
-    return "+" + prefix + digits;
-  };
-
   const handleCollectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setOrderError(null);
     await updateEmail(email);
-    const rawPhone = address.phone?.trim() || "";
-    if (!rawPhone) {
+    const phone = address.phone?.trim() || "";
+    if (!phone) {
       setOrderError("Phone number is required for studio collection");
       return;
     }
-    const phone = normalizePhoneForCountry(rawPhone, address.country.code);
-    if (!phone || phone.length < 8) {
-      setOrderError("Invalid phone number format. Please enter a valid phone number.");
+    if (!isValidPhoneNumber(phone)) {
+      setOrderError("Invalid phone number. Please check the country code and number.");
       return;
     }
     const studioAddress: Address = {
@@ -135,7 +111,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
     // Billing-only update — shipping update skipped (no KE shipping zone on Saleor Cloud).
     const billingOk = await updateBillingAddress(studioAddress);
     if (!billingOk) {
-      setOrderError("Phone number validation failed. Please check your phone number and try again.");
+      setOrderError("Could not process your information. Please check all fields and try again.");
       return;
     }
     // Use Saleor Cloud "Default" warehouse for click-and-collect.
@@ -338,12 +314,12 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                   </div>
                 </div>
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone (optional)</label>
-                  <input
-                    type="tel"
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone (required for collection)</label>
+                  <PhoneInput
                     value={address.phone || ""}
-                    onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    onChange={(phone) => setAddress({ ...address, phone })}
+                    defaultCountry="KE"
+                    required
                   />
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-md mb-6">
@@ -499,11 +475,10 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
 
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Phone (optional)</label>
-                  <input
-                    type="tel"
+                  <PhoneInput
                     value={address.phone || ""}
-                    onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    onChange={(phone) => setAddress({ ...address, phone })}
+                    defaultCountry="KE"
                   />
                 </div>
 

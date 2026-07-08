@@ -1,0 +1,35 @@
+/* Override react-phone-number-input styles to match form field theme */
+
+.phone-input-wrapper {
+  --rpi-background-color: white;
+  --rpi-border-color: #d1d5db;
+  --rpi-border-radius: 0.375rem;
+  --rpi-input-padding: 0.75rem 0.75rem;
+  --rpi-input-font-size: 1rem;
+  --rpi-input-font-family: inherit;
+}
+
+.phone-input-wrapper input {
+  border-color: #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.phone-input-wrapper input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.phone-input-wrapper .rpi-country-select {
+  border-color: #d1d5db;
+  border-right: 1px solid #d1d5db;
+  padding: 0.5rem 0.5rem;
+}
+
+.phone-input-wrapper .rpi-country-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
