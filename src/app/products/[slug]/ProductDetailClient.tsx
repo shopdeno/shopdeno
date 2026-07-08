@@ -791,7 +791,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
                 <ul className="list-disc pl-5 space-y-1 mb-6">
                   <li><strong>Processing Time:</strong> Orders are processed within 1–2 business days.</li>
                   <li><strong>Delivery Time:</strong> Standard shipping takes 5–10 business days.</li>
-                  <li><strong>Packaging:</strong> Prints ship rolled in a sturdy protective tube.</li>
+                  <li><strong>Packaging:</strong> Shipped flat in a premium rigid, reinforced cardboard mailer to help ensure your print arrives in pristine condition.</li>
                   <li><strong>Tracking:</strong> A tracking number is emailed once your order ships.</li>
                 </ul>
                 <h3 className="font-semibold text-gray-900 mb-3">Return & Exchange Policy</h3>
