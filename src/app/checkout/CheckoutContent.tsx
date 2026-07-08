@@ -84,18 +84,45 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
     setStep("payment");
   };
 
+  // Map country codes to phone prefixes for E.164 normalization
+  const countryPhonePrefixes: Record<string, string> = {
+    KE: "254", // Kenya
+    IE: "353", // Ireland
+    GB: "44",  // United Kingdom
+    US: "1",   // United States
+    ZA: "27",  // South Africa
+  };
+
+  const normalizePhoneForCountry = (rawPhone: string, countryCode: string): string | undefined => {
+    if (!rawPhone.trim()) return undefined;
+    const phone = rawPhone.trim();
+    if (phone.startsWith("+")) return phone;
+
+    const prefix = countryPhonePrefixes[countryCode];
+    if (!prefix) {
+      // Unknown country — try to guess from leading 0
+      return phone.startsWith("0") ? "+" + phone.slice(1) : "+" + phone;
+    }
+
+    // Remove leading 0 if present, then prepend country code
+    const digits = phone.startsWith("0") ? phone.slice(1) : phone;
+    return "+" + prefix + digits;
+  };
+
   const handleCollectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setOrderError(null);
     await updateEmail(email);
     const rawPhone = address.phone?.trim() || "";
-    // Saleor requires E.164. Kenyan numbers starting with 07/01 → +2547/+2541.
-    const phone = rawPhone
-      ? rawPhone.startsWith("+")
-        ? rawPhone
-        : rawPhone.startsWith("0")
-        ? "+254" + rawPhone.slice(1)
-        : "+" + rawPhone
-      : undefined;
+    if (!rawPhone) {
+      setOrderError("Phone number is required for studio collection");
+      return;
+    }
+    const phone = normalizePhoneForCountry(rawPhone, address.country.code);
+    if (!phone || phone.length < 8) {
+      setOrderError("Invalid phone number format. Please enter a valid phone number.");
+      return;
+    }
     const studioAddress: Address = {
       firstName: address.firstName,
       lastName: address.lastName,
@@ -108,7 +135,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
     // Billing-only update — shipping update skipped (no KE shipping zone on Saleor Cloud).
     const billingOk = await updateBillingAddress(studioAddress);
     if (!billingOk) {
-      console.error("Billing address update failed — aborting collect flow");
+      setOrderError("Phone number validation failed. Please check your phone number and try again.");
       return;
     }
     // Use Saleor Cloud "Default" warehouse for click-and-collect.
