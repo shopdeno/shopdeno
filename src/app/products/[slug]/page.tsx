@@ -44,29 +44,30 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const client = getSaleorClient();
   const channel = getChannel();
 
+  let product = null;
   try {
     const result = await client.query(PRODUCT_DETAIL_QUERY, { slug, channel });
-    const product = result.data?.product;
-
-    if (!product) {
-      notFound();
-    }
-
-    let relatedProducts: ProductCardProduct[] = [];
-    if (product.category?.id) {
-      const relatedResult = await client.query(RELATED_PRODUCTS_QUERY, {
-        channel,
-        categoryId: product.category.id,
-      });
-      relatedProducts = (relatedResult.data?.products?.edges ?? [])
-        .map((e: { node: ProductCardProduct }) => e.node)
-        .filter((p: ProductCardProduct) => p.id !== product.id)
-        .slice(0, 4);
-    }
-
-    return <ProductDetailClient product={product} relatedProducts={relatedProducts} />;
+    product = result.data?.product ?? null;
   } catch (error) {
-    console.error("Error fetching product:", error);
+    console.error("SLUG_NOT_FOUND product slug=%s error=%s", slug, error);
     notFound();
   }
+
+  if (!product) {
+    notFound();
+  }
+
+  let relatedProducts: ProductCardProduct[] = [];
+  if (product.category?.id) {
+    const relatedResult = await client.query(RELATED_PRODUCTS_QUERY, {
+      channel,
+      categoryId: product.category.id,
+    });
+    relatedProducts = (relatedResult.data?.products?.edges ?? [])
+      .map((e: { node: ProductCardProduct }) => e.node)
+      .filter((p: ProductCardProduct) => p.id !== product.id)
+      .slice(0, 4);
+  }
+
+  return <ProductDetailClient product={product} relatedProducts={relatedProducts} />;
 }
