@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
+import { getBlurDataURL } from "@/lib/imageUtils";
 
 interface Collection {
   id: string;
@@ -98,6 +99,7 @@ export function ProductGrid({
             fill
             className="object-cover"
             priority
+            blurDataURL={getBlurDataURL()}
           />
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute inset-0 flex items-center justify-center">

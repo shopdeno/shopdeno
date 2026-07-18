@@ -7,6 +7,7 @@ import { Menu, X, ShoppingBag, User, Search } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { siteConfig } from "@/lib/site-config";
+import { getBlurDataURL } from "@/lib/imageUtils";
 
 interface MenuItem {
   id: string;
@@ -70,6 +71,7 @@ export function Header({ menuItems = [] }: HeaderProps) {
                 height={48}
                 className="h-12 w-auto"
                 priority
+                blurDataURL={getBlurDataURL()}
               />
             </Link>
           </div>

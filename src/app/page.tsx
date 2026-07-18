@@ -7,6 +7,7 @@ import { getSaleorClient, getChannel } from "@/lib/saleor";
 import { PRODUCTS_QUERY } from "@/graphql/queries";
 import { siteConfig, FEATURED_SLUGS, productDisplayName } from "@/lib/site-config";
 import { VideoModal } from "@/components/VideoModal";
+import { getBlurDataURL } from "@/lib/imageUtils";
 
 // Static metadata must live in a separate layout or route segment when using
 // "use client". Homepage metadata is set in layout.tsx via siteConfig.
@@ -66,6 +67,7 @@ function ProductStripe({
                           alt={product.thumbnail.alt || product.name}
                           fill
                           className="object-cover group-hover:opacity-75 transition-opacity"
+                          blurDataURL={getBlurDataURL()}
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center bg-gray-200">
@@ -95,7 +97,6 @@ export default function HomePage() {
   const [products, setProducts] = useState<any[]>([]);
   const [vimeoOpen, setVimeoOpen] = useState(false);
   const [bbcOpen, setBbcOpen] = useState(false);
-  const [portraitIndex, setPortraitIndex] = useState(0);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [featuredCarouselIndex, setFeaturedCarouselIndex] = useState(2);
   const CAROUSEL_VISIBLE = 2;
@@ -117,14 +118,6 @@ export default function HomePage() {
     })();
   }, []);
 
-  useEffect(() => {
-    if (products.length === 0) return;
-    const id = setInterval(() => {
-      setPortraitIndex((i) => (i + 1) % products.length);
-    }, 1000);
-    return () => clearInterval(id);
-  }, [products.length]);
-
   const featuredProducts = products.filter(({ node }: any) => FEATURED_SLUGS.has(node.slug));
   const bebaProducts = products.filter(({ node }: any) => node.category?.slug?.includes("beba"));
   const nonFeaturedNonBeba = products.filter(
@@ -142,6 +135,7 @@ export default function HomePage() {
             fill
             className="object-cover object-center"
             priority
+            blurDataURL={getBlurDataURL()}
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
@@ -196,14 +190,16 @@ export default function HomePage() {
               width={120}
               height={24}
               className="h-6 w-auto"
+              blurDataURL={getBlurDataURL()}
             />
-            <span className="text-gray-500">&amp;</span>
+            <span className="text-gray-500">&</span>
             <Image
               src="/bbc-white.svg"
               alt="BBC"
               width={60}
               height={24}
               className="h-6 w-auto"
+              blurDataURL={getBlurDataURL()}
             />
           </div>
         </div>
@@ -339,10 +335,11 @@ export default function HomePage() {
           </div>
           <div className="flex flex-col gap-6">
             <div className="relative aspect-[3/4] rounded-xl overflow-hidden">
-              {(products[portraitIndex]?.node?.media?.[0]?.url || products[portraitIndex]?.node?.thumbnail?.url) && (
+              {/* Show first product portrait or fallback to Dennis Muraguri image */}
+              {products.length > 0 && (
                 <Image
-                  key={portraitIndex}
-                  src={products[portraitIndex].node.media?.[0]?.url ?? products[portraitIndex].node.thumbnail.url}
+                  key="portrait-0"
+                  src={products[0]?.node?.media?.[0]?.url ?? products[0]?.node?.thumbnail?.url ?? "/dennis-muraguri.webp"}
                   alt=""
                   fill
                   className="object-cover transition-opacity duration-500 z-0"
@@ -468,7 +465,7 @@ export default function HomePage() {
                   />
                 </div>
                 <h3 className="mt-4 text-xl font-bold text-white uppercase">Matatu 4 President</h3>
-                <p className="text-gray-400 text-sm">Manyaga, Music, Mischief &amp; Mayhem.</p>
+                <p className="text-gray-400 text-sm">Manyaga, Music, Mischief & Mayhem.</p>
               </Link>
               <Link href="/products/ecko-unltd-ongata-line-transporters" className="group">
                 <div className="relative w-full rounded-xl overflow-hidden bg-gray-800">
@@ -609,37 +606,37 @@ export default function HomePage() {
       {/* ── Section 8: WePresent Feature ── */}
       <section className="bg-white">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <Image
-            src="/wepresent-interview.avif"
-            alt="Dennis Muraguri featured on WePresent"
-            width={0}
-            height={0}
-            sizes="100vw"
-            className="w-full h-auto rounded-xl"
-          />
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">As featured in</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <Image
-              src="/wepresent-white.svg"
-              alt="WeTransfer's WePresent"
-              width={220}
-              height={44}
-              className="h-11 w-auto mb-4 brightness-0"
+              src="/wepresent-interview.avif"
+              alt="Dennis Muraguri featured on WePresent"
+              width={0}
+              height={0}
+              sizes="100vw"
+              className="w-full h-auto rounded-xl"
             />
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-              Interview with writer Alix-Rose Cowie
-            </h2>
-            <a
-              href="https://wepresent.wetransfer.com/stories/dennis-muraguri-woodcut-matatu-prints"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-6 text-indigo-600 font-medium underline underline-offset-4 hover:text-indigo-500"
-            >
-              To WePresent&apos;s interview…
-            </a>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">As featured in</p>
+              <Image
+                src="/wepresent-white.svg"
+                alt="WeTransfer's WePresent"
+                width={220}
+                height={44}
+                className="h-11 w-auto mb-4 brightness-0"
+              />
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                Interview with writer Alix-Rose Cowie
+              </h2>
+              <a
+                href="https://wepresent.wetransfer.com/stories/dennis-muraguri-woodcut-matatu-prints"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-6 text-indigo-600 font-medium underline underline-offset-4 hover:text-indigo-500"
+              >
+                To WePresent&apos;s interview…
+              </a>
+            </div>
           </div>
-        </div>
         </div>
       </section>
 

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "generate-gifs": "node --env-file=.env scripts/generate-product-gifs.mjs"
   },
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.2.0",

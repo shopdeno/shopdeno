@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getBlurDataURL } from "@/lib/imageUtils";
 
 function toPlainText(raw?: string | null): string {
   if (!raw) return "";
@@ -52,6 +53,7 @@ export function BrowseLanding({ title, subtitle, items, hrefPrefix }: BrowseLand
                       alt={item.backgroundImage.alt || item.name}
                       fill
                       className="object-cover object-center transition-opacity group-hover:opacity-75"
+                      blurDataURL={getBlurDataURL()}
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center bg-gray-200">

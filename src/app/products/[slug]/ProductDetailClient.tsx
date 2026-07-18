@@ -7,6 +7,7 @@ import { useCart } from "@/context/CartContext";
 import { ChevronLeft, ChevronRight, X, Check, Loader2, ShoppingCart, Heart, Truck, Clock, Share2, MapPin } from "lucide-react";
 import { ProductCard, type ProductCardProduct } from "@/components/ProductCard";
 import { productDisplayName } from "@/lib/site-config";
+import { getBlurDataURL } from "@/lib/imageUtils";
 
 // Client-side color name → hex fallback for DROPDOWN Color attribute
 // (Saleor DROPDOWN type stores no hex; value.value is empty)
@@ -370,6 +371,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="w-full h-auto"
                   priority
+                  blurDataURL={getBlurDataURL()}
                 />
               ) : (
                 <div className="flex h-48 items-center justify-center text-gray-400">No Image</div>
@@ -396,7 +398,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
                       }`}
                       style={isActive || isHovered ? { borderColor: thumbColor } : undefined}
                     >
-                      <Image src={image.url} alt={image.alt || `${product.name} ${idx + 1}`} fill className="object-cover" />
+                      <Image src={image.url} alt={image.alt || `${product.name} ${idx + 1}`} fill className="object-cover" blurDataURL={getBlurDataURL()} />
                     </button>
                   );
                 })}
@@ -868,6 +870,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
               fill
               className="object-contain"
               sizes="(max-width: 768px) 100vw, 768px"
+              blurDataURL={getBlurDataURL()}
             />
           </div>
 
@@ -896,7 +899,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
                     idx === selectedImage ? "border-white" : "border-transparent opacity-50 hover:opacity-80"
                   }`}
                 >
-                  <Image src={image.url} alt={image.alt || `${product.name} ${idx + 1}`} fill className="object-cover" />
+                  <Image src={image.url} alt={image.alt || `${product.name} ${idx + 1}`} fill className="object-cover" blurDataURL={getBlurDataURL()} />
                 </button>
               ))}
             </div>
@@ -911,7 +914,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
             <div className="flex items-center gap-4">
               {sortedProductImages[0] && (
                 <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md">
-                  <Image src={sortedProductImages[0].url} alt={product.name} fill className="object-cover" />
+                  <Image src={sortedProductImages[0].url} alt={product.name} fill className="object-cover" blurDataURL={getBlurDataURL()} />
                 </div>
               )}
               <div>

@@ -5,6 +5,7 @@ import { getSaleorClient, getChannel } from "@/lib/saleor";
 import { CATEGORY_DETAIL_QUERY, PRODUCTS_QUERY } from "@/graphql/queries";
 import { toProductOrder } from "@/lib/product-sort";
 import { ProductCard, type ProductCardProduct } from "@/components/ProductCard";
+import { getBlurDataURL } from "@/lib/imageUtils";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -63,6 +64,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             fill
             className="object-cover"
             priority
+            blurDataURL={getBlurDataURL()}
           />
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute inset-0 flex items-center justify-center">

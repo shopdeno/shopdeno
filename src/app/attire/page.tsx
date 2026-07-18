@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { siteConfig } from "@/lib/site-config";
+import { getBlurDataURL } from "@/lib/imageUtils";
 
 export const metadata: Metadata = {
   title: "Attire — Coming Soon | Dennis Muraguri",
@@ -87,6 +88,7 @@ export default function AttirePage() {
                 alt="Dennis Muraguri graphic tee"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-500"
+                blurDataURL={getBlurDataURL()}
               />
             </div>
           ))}
@@ -96,6 +98,7 @@ export default function AttirePage() {
               alt="Dennis Muraguri graphic tee"
               fill
               className="object-cover hover:scale-105 transition-transform duration-500"
+              blurDataURL={getBlurDataURL()}
             />
           </div>
           {TEES.slice(4).map((file) => (
@@ -105,6 +108,7 @@ export default function AttirePage() {
                 alt="Dennis Muraguri graphic tee"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-500"
+                blurDataURL={getBlurDataURL()}
               />
             </div>
           ))}
@@ -125,6 +129,7 @@ export default function AttirePage() {
                 alt="Dennis Muraguri tote bag"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-500"
+                blurDataURL={getBlurDataURL()}
               />
             </div>
           ))}
@@ -158,6 +163,7 @@ export default function AttirePage() {
                 alt="Dennis Muraguri attire hang tag"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-500"
+                blurDataURL={getBlurDataURL()}
               />
             </div>
           ))}
@@ -178,6 +184,7 @@ export default function AttirePage() {
                 alt="Dennis Muraguri top"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-500"
+                blurDataURL={getBlurDataURL()}
               />
             </div>
           ))}

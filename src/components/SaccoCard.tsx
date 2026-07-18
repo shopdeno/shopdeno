@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { getBlurDataURL } from "@/lib/imageUtils";
 
 const WAVE_STEP_MS = 160;   // delay between consecutive cards
 const IMAGE_HOLD_MS = 2800; // how long each image is visible
@@ -31,50 +32,51 @@ interface SaccoCardProps {
 }
 
 export function SaccoCard({ name, slug, images, index, description }: SaccoCardProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [showHoverImage, setShowHoverImage] = useState(false);
 
-  useEffect(() => {
-    if (images.length <= 1) return;
-
-    let interval: ReturnType<typeof setInterval>;
-    const startTimer = setTimeout(() => {
-      interval = setInterval(() => {
-        setActiveIndex((i) => (i + 1) % images.length);
-      }, IMAGE_HOLD_MS);
-    }, index * WAVE_STEP_MS);
-
-    return () => {
-      clearTimeout(startTimer);
-      clearInterval(interval);
-    };
-  }, [images.length, index]);
+  const defaultImage = images[0];
+  const hoverImage = images.length > 1 ? images[1] : null;
 
   return (
-    <Link href={`/saccos/${slug}`} className="group">
+    <Link
+      href={`/saccos/${slug}`}
+      className="group"
+      onMouseEnter={() => setShowHoverImage(true)}
+      onMouseLeave={() => setShowHoverImage(false)}
+    >
       <div className="aspect-square w-full overflow-hidden rounded-lg bg-gray-100 relative">
         {images.length === 0 ? (
           <div className="flex h-full items-center justify-center bg-gray-200">
             <span className="text-gray-400 text-sm">{name}</span>
           </div>
         ) : (
-          images.map((url, i) => (
-            <div
-              key={url}
-              className="absolute inset-0"
-              style={{
-                opacity: i === activeIndex ? 1 : 0,
-                transition: `opacity ${FADE_MS}ms ease-in-out`,
-              }}
-            >
+          <>
+            {defaultImage ? (
               <Image
-                src={url}
+                src={defaultImage}
                 alt={`${name} print`}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                 className="object-cover object-center"
+                priority
+                blurDataURL={getBlurDataURL()}
               />
-            </div>
-          ))
+            ) : (
+              <div className="flex h-full items-center justify-center bg-gray-200">
+                <span className="text-gray-400">No Image</span>
+              </div>
+            )}
+            {hoverImage && showHoverImage ? (
+              <Image
+                src={hoverImage}
+                alt={`${name} print`}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+                className="object-cover object-center absolute inset-0 opacity-0 transition-opacity duration-300 hover:opacity-100"
+                blurDataURL={getBlurDataURL()}
+              />
+            ) : null}
+          </>
         )}
       </div>
       <h3 className="mt-4 text-lg font-medium text-gray-900 group-hover:text-gray-600 transition-colors">

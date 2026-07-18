@@ -9,6 +9,7 @@ import { PhoneInput } from "@/components/PhoneInput";
 import { siteConfig } from "@/lib/site-config";
 import { Check, Loader2, ChevronLeft, Building2, Truck } from "lucide-react";
 import { isValidPhoneNumber } from "react-phone-number-input";
+import { getBlurDataURL } from "@/lib/imageUtils";
 
 interface Cart {
   id: string;
@@ -746,6 +747,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                           alt={line.variant.product.name}
                           fill
                           className="object-cover"
+                          blurDataURL={getBlurDataURL()}
                         />
                       ) : (
                         <div className="h-full w-full flex items-center justify-center text-gray-400 text-xs">
