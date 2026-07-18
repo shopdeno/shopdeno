@@ -35,10 +35,10 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    // Next 16 blocks optimizing images from private IPs (SSRF guard). The local
-    // docker Saleor is 127.0.0.1, so serve images unoptimized in dev only.
-    // Production (public Saleor Cloud host) keeps full optimization.
-    unoptimized: process.env.NODE_ENV === "development",
+    // Vercel Hobby plan has a 1,000 image optimization transformations/month limit.
+    // Saleor Cloud already serves images via CloudFront CDN, so bypass Vercel's
+    // optimizer entirely to avoid 402 errors when quota is exhausted.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
