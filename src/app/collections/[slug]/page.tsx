@@ -5,6 +5,7 @@ import { getSaleorClient, getChannel } from "@/lib/saleor";
 import { COLLECTION_DETAIL_QUERY, PRODUCTS_QUERY } from "@/graphql/queries";
 import { toProductOrder } from "@/lib/product-sort";
 import { ProductGrid } from "./ProductGrid";
+import { siteConfig } from "@/lib/site-config";
 
 interface CollectionPageProps {
   params: Promise<{ slug: string }>;
@@ -31,6 +32,9 @@ export async function generateMetadata({ params }: CollectionPageProps): Promise
     return {
       title: collection.seoTitle || collection.name,
       description: collection.seoDescription || collection.description,
+      alternates: {
+        canonical: `${siteConfig.url}/collections/${slug}`,
+      },
     };
   } catch {
     return { title: "Collection" };

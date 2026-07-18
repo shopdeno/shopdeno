@@ -6,6 +6,7 @@ import { CATEGORY_DETAIL_QUERY, PRODUCTS_QUERY } from "@/graphql/queries";
 import { toProductOrder } from "@/lib/product-sort";
 import { ProductCard, type ProductCardProduct } from "@/components/ProductCard";
 import { getBlurDataURL } from "@/lib/imageUtils";
+import { siteConfig } from "@/lib/site-config";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -21,6 +22,9 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     return {
       title: category.seoTitle || category.name,
       description: category.seoDescription || undefined,
+      alternates: {
+        canonical: `${siteConfig.url}/categories/${slug}`,
+      },
     };
   } catch {
     return { title: "Category" };

@@ -8,6 +8,9 @@ import { siteConfig } from "@/lib/site-config";
 export const metadata: Metadata = {
   title: `Shop SACCO | ${siteConfig.name}`,
   description: "Browse Dennis Muraguri's matatu art prints organised by Nairobi SACCO and route.",
+  alternates: {
+    canonical: `${siteConfig.url}/saccos`,
+  },
 };
 
 interface CategoryNode {

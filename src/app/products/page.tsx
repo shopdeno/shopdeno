@@ -9,6 +9,9 @@ import { siteConfig, FEATURED_SLUGS } from "@/lib/site-config";
 export const metadata: Metadata = {
   title: "Shop DENO",
   description: `Browse all matatu and sacco art prints from ${siteConfig.name}.`,
+  alternates: {
+    canonical: `${siteConfig.url}/products`,
+  },
 };
 
 export default async function ProductsPage({

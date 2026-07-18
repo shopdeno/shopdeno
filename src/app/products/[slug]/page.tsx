@@ -4,6 +4,7 @@ import { getSaleorClient, getChannel } from "@/lib/saleor";
 import { PRODUCT_DETAIL_QUERY, RELATED_PRODUCTS_QUERY } from "@/graphql/queries";
 import { ProductDetailClient } from "./ProductDetailClient";
 import type { ProductCardProduct } from "@/components/ProductCard";
+import { siteConfig } from "@/lib/site-config";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -28,6 +29,9 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     return {
       title: product.seoTitle || product.name,
       description: product.seoDescription || product.description,
+      alternates: {
+        canonical: `${siteConfig.url}/products/${slug}`,
+      },
       openGraph: {
         title: product.seoTitle || product.name,
         description: product.seoDescription || product.description,

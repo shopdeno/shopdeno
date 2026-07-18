@@ -3,10 +3,17 @@ import { getSaleorClient, getChannel } from "@/lib/saleor";
 import { PRODUCTS_QUERY } from "@/graphql/queries";
 import { ProductCard, type ProductCardProduct } from "@/components/ProductCard";
 import { SearchBox } from "@/components/SearchBox";
+import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Search",
   description: "Search matatu and sacco art prints.",
+  alternates: {
+    canonical: `${siteConfig.url}/search`,
+  },
+  robots: {
+    index: false,
+  },
 };
 
 interface SearchPageProps {
