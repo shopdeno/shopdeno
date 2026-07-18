@@ -68,19 +68,19 @@ export function ProductCard({ product }: { product: ProductCardProduct }) {
             <span className="text-gray-400">No Image</span>
           </div>
         )}
-        {/* Hover GIF (if available) */}
-        {gifSrc && showHover ? (
+        {/* Hover GIF (if available) — always in DOM so browser preloads it;
+            CSS opacity toggled on hover to avoid conditional mount/unmount
+            which causes React "Node cannot be found" errors. */}
+        {gifSrc && (
           <Image
             src={gifSrc}
             alt={`${product.name} variations`}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover object-center absolute inset-0"
+            className={`object-cover object-center absolute inset-0 transition-opacity duration-200 ${showHover ? "opacity-100" : "opacity-0"}`}
             unoptimized
-            // `unoptimized` serves the GIF straight from /public — bypasses
-            // /_next/image so animation frames never hit Vercel Image Optimization.
           />
-        ) : null}
+        )}
       </div>
       <h3 className="mt-4 text-sm font-medium text-gray-700">{productDisplayName(product.name)}</h3>
       <div className="mt-1 flex items-center gap-2">
