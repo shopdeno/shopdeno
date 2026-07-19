@@ -76,23 +76,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     ) || [];
 
-    const categoryUrls = categoriesResult.data?.categories?.edges?.map(
-      ({ node }: { node: { slug: string; updatedAt?: string } }) => ({
+    // Only include categories relevant to the art shop — excludes Saleor demo/scaffold
+    // categories (accessories, audiobooks, apparel, etc.) which have no products and
+    // would be flagged as "Crawled — currently not indexed" by Google.
+    const ALLOWED_CATEGORY_SLUGS = new Set<string>([
+      ...SACCO_CATEGORY_SLUGS,
+      "dennis-muraguri-matatu-woodcut-prints-reproductions-on-paper",
+      "beba",
+    ]);
+
+    const categoryUrls = (categoriesResult.data?.categories?.edges || [])
+      .filter(({ node }: { node: { slug: string } }) => ALLOWED_CATEGORY_SLUGS.has(node.slug))
+      .map(({ node }: { node: { slug: string; updatedAt?: string } }) => ({
         url: `${baseUrl}/categories/${node.slug}`,
         lastModified: node.updatedAt ? new Date(node.updatedAt) : new Date(),
         changeFrequency: "weekly" as const,
         priority: 0.7,
-      })
-    ) || [];
+      }));
 
+    // /saccos/{slug} pages canonicalise to /categories/{slug}, so exclude them from
+    // the sitemap to avoid signalling duplicate content to Google.
     const saccoUrls = [
       { url: `${baseUrl}/saccos`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
-      ...SACCO_CATEGORY_SLUGS.map((slug) => ({
-        url: `${baseUrl}/saccos/${slug}`,
-        lastModified: new Date(),
-        changeFrequency: "weekly" as const,
-        priority: 0.7,
-      })),
     ];
 
     return [...staticPages, ...productUrls, ...categoryUrls, ...collectionUrls, ...saccoUrls];

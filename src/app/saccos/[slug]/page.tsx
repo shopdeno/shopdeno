@@ -22,6 +22,7 @@ import { CATEGORY_DETAIL_QUERY, PRODUCTS_QUERY } from "@/graphql/queries";
 import { toProductOrder } from "@/lib/product-sort";
 import { ProductCard, type ProductCardProduct } from "@/components/ProductCard";
 import { getBlurDataURL } from "@/lib/imageUtils";
+import { siteConfig } from "@/lib/site-config";
 
 interface SaccoPageProps {
   params: Promise<{ slug: string }>;
@@ -37,6 +38,9 @@ export async function generateMetadata({ params }: SaccoPageProps): Promise<Meta
     return {
       title: category.seoTitle || `${category.name} Prints`,
       description: category.seoDescription || undefined,
+      alternates: {
+        canonical: `${siteConfig.url}/categories/${slug}`,
+      },
     };
   } catch {
     return { title: "SACCO" };
