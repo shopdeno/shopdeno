@@ -39,7 +39,7 @@ services:
       - key: AWS_S3_CUSTOM_DOMAIN
         value: sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media
       - key: EMAIL_HOST
-        value: smtp-relay.brevo.com
+        value: smtp.resend.com
       - key: EMAIL_PORT
         value: 587
       - key: EMAIL_HOST_USER
