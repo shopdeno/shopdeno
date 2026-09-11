@@ -1,5 +1,5 @@
-# Render Blueprint: single free web service (Frankfurt) running the Saleor
-# API + celery worker + beat in one container (see hosting/start.sh).
+# Render Blueprint: two free services (Frankfurt) sharing the 750h/month pool.
+# Both sleep when idle, so low-traffic usage stays inside the free quota.
 # DB = Neon, cache/broker = Upstash, media = Supabase Storage.
 # Secrets use `sync: false` so Render prompts for values in the dashboard.
 services:
@@ -44,6 +44,49 @@ services:
         value: 587
       - key: EMAIL_HOST_USER
         sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        value: sales@shop.dennis-muraguri.co.ke
+  - type: web
+    name: shopdeno-saleor-worker
+    runtime: docker
+    repo: https://github.com/shopdeno/shopdeno
+    branch: main
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./hosting/Dockerfile
+    dockerContext: ./hosting
+    healthCheckPath: /
+    envVars:
+      - key: MODE
+        value: worker
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: DEFAULT_CHANNEL_SLUG
+        value: default-channel
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_MEDIA_BUCKET_NAME
+        value: saleor-media
+      - key: AWS_S3_ENDPOINT_URL
+        value: https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/s3
+      - key: AWS_S3_REGION_NAME
+        value: eu-west-1
+      - key: AWS_S3_CUSTOM_DOMAIN
+        value: sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media
+      - key: EMAIL_HOST
+        value: smtp.resend.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_HOST_USER
+        value: resend
       - key: EMAIL_HOST_PASSWORD
         sync: false
       - key: DEFAULT_FROM_EMAIL

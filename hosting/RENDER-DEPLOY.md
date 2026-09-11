@@ -1,5 +1,11 @@
 # Deploy Saleor API to Render free (no card)
 
+Two free web services (Frankfurt), sharing the 750h/month pool — both sleep
+when idle, so low traffic stays free:
+- `shopdeno-saleor-api` — uvicorn only (migrate on boot)
+- `shopdeno-saleor-worker` — celery worker + beat + tiny keepalive HTTP.
+  Generates thumbnails, sends mail, runs scheduled tasks.
+
 ## 1. Render account
 Sign up at https://dashboard.render.com (free, no card). One workspace is fine.
 
