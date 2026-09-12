@@ -6,6 +6,10 @@ import { SACCO_CATEGORY_SLUGS } from "@/lib/browse-config";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://yourstore.com";
 
+// Regenerate hourly instead of freezing at build time: the Saleor backend on
+// Render free sleeps when idle, so a build-time snapshot can come out empty.
+export const revalidate = 3600;
+
 const CATEGORIES_LIST_QUERY = gql`
   query CategoriesList($first: Int!) {
     categories(first: $first) {
