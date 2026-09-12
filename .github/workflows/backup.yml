@@ -21,7 +21,9 @@ jobs:
       - name: Install postgres client + awscli
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq postgresql-client awscli
+          sudo apt-get install -y -qq postgresql-client
+          pip3 install -q awscli --break-system-packages
+          aws --version
 
       - name: Dump database
         env:
