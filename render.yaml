@@ -36,7 +36,7 @@ services:
         value: https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/s3
       - key: AWS_S3_REGION_NAME
         value: eu-west-1
-      - key: AWS_S3_CUSTOM_DOMAIN
+      - key: AWS_MEDIA_CUSTOM_DOMAIN
         value: sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media
       - key: EMAIL_HOST
         value: smtp.resend.com
@@ -79,7 +79,7 @@ services:
         value: https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/s3
       - key: AWS_S3_REGION_NAME
         value: eu-west-1
-      - key: AWS_S3_CUSTOM_DOMAIN
+      - key: AWS_MEDIA_CUSTOM_DOMAIN
         value: sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media
       - key: EMAIL_HOST
         value: smtp.resend.com
