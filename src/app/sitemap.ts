@@ -57,7 +57,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const channel = process.env.NEXT_PUBLIC_SALEOR_CHANNEL || "default-channel";
     const [productsResult, collectionsResult, categoriesResult] = await Promise.all([
-      client.query(PRODUCTS_QUERY, { channel, first: 200 }),
+      // NOTE: Saleor caps `first` at 100 — requesting more errors the whole
+      // query and silently empties this section (70 products fit in 100).
+      client.query(PRODUCTS_QUERY, { channel, first: 100 }),
       client.query(COLLECTIONS_QUERY, { channel, first: 100 }),
       client.query(CATEGORIES_LIST_QUERY, { first: 100 }),
     ]);
