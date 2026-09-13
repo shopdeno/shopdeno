@@ -45,9 +45,9 @@ jobs:
           S3_ENDPOINT_URL: ${{ secrets.S3_ENDPOINT_URL }}
           S3_BACKUP_BUCKET: ${{ secrets.S3_BACKUP_BUCKET }}
         run: |
-          STAMP=$(date -u +%Y%m%d-%H%M)
+          DUMP=$(ls saleor-prod-*.dump | head -1)
           aws --endpoint-url "$S3_ENDPOINT_URL" s3 cp \
-            "saleor-prod-${STAMP}.dump" "s3://${S3_BACKUP_BUCKET}/saleor-prod-${STAMP}.dump"
+            "$DUMP" "s3://${S3_BACKUP_BUCKET}/${DUMP}"
           # Prune copies older than 30 days (by filename date prefix)
           CUTOFF=$(date -u -d "30 days ago" +%Y%m%d)
           for f in $(aws --endpoint-url "$S3_ENDPOINT_URL" s3 ls "s3://${S3_BACKUP_BUCKET}/" \
