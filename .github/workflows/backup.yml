@@ -34,7 +34,7 @@ jobs:
           DATABASE_URL: ${{ secrets.SELFHOST_DATABASE_URL }}
         run: |
           STAMP=$(date -u +%Y%m%d-%H%M)
-          pg_dump --format=custom --no-owner --dbname="$DATABASE_URL" \
+          /usr/lib/postgresql/18/bin/pg_dump --format=custom --no-owner --dbname="$DATABASE_URL" \
             --file="saleor-prod-${STAMP}.dump"
           ls -la saleor-prod-*.dump
 
