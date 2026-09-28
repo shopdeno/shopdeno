@@ -5,6 +5,13 @@ import { ProductCard, type ProductCardProduct } from "@/components/ProductCard";
 import { SortSelect } from "@/components/SortSelect";
 import { toProductOrder } from "@/lib/product-sort";
 import { siteConfig, FEATURED_SLUGS } from "@/lib/site-config";
+import {
+  loadCatalogSnapshot,
+  sortSnapshot,
+  toCardProduct,
+  type SnapshotLight,
+} from "@/lib/catalog-snapshot";
+import { LIVE_TIMEOUT_MS } from "@/lib/live-timeout";
 
 export const metadata: Metadata = {
   title: "Shop DENO",
@@ -13,6 +20,25 @@ export const metadata: Metadata = {
     canonical: `${siteConfig.url}/products`,
   },
 };
+
+// Hourly ISR: Vercel serves the edge-cached grid instantly; the snapshot
+// (public/catalog/catalog.json, refreshed nightly) covers Render cold starts.
+export const revalidate = 3600;
+
+
+
+function orderNodes<T extends { slug: string; categorySlug?: string | null }>(
+  nodes: T[],
+): T[] {
+  const featured = nodes.filter(
+    (n) => FEATURED_SLUGS.has(n.slug) && !n.categorySlug?.includes("beba"),
+  );
+  const rest = nodes.filter(
+    (n) => !FEATURED_SLUGS.has(n.slug) && !n.categorySlug?.includes("beba"),
+  );
+  const beba = nodes.filter((n) => n.categorySlug?.includes("beba"));
+  return [...featured, ...rest, ...beba];
+}
 
 export default async function ProductsPage({
   searchParams,
@@ -24,19 +50,48 @@ export default async function ProductsPage({
   const channel = getChannel();
 
   let products: { node: ProductCardProduct }[] = [];
-  try {
-    const result = await client.query(PRODUCTS_QUERY, {
+  let fromSnapshot = false;
+
+  const liveQuery = client
+    .query(PRODUCTS_QUERY, {
       channel,
       first: 100,
       sortBy: toProductOrder(sort, channel),
-    });
-    const edges = result.data?.products?.edges || [];
-    const featured = edges.filter((e: any) => FEATURED_SLUGS.has(e.node.slug) && !e.node.category?.slug?.includes("beba"));
-    const rest = edges.filter((e: any) => !FEATURED_SLUGS.has(e.node.slug) && !e.node.category?.slug?.includes("beba"));
-    const beba = edges.filter((e: any) => e.node.category?.slug?.includes("beba"));
+    })
+    .toPromise();
+  try {
+    const result = await Promise.race([
+      liveQuery,
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`live Saleor timed out after ${LIVE_TIMEOUT_MS}ms`)),
+          LIVE_TIMEOUT_MS,
+        ),
+      ),
+    ]);
+    // urql resolves (not rejects) on network/GraphQL errors — surface them
+    // so the snapshot fallback below engages instead of rendering empty.
+    if (result.error) throw result.error;
+    type Edge = { node: ProductCardProduct & { category?: { slug?: string } | null } };
+    const edges: Edge[] = result.data?.products?.edges || [];
+    const featured = edges.filter(
+      (e) => FEATURED_SLUGS.has(e.node.slug) && !e.node.category?.slug?.includes("beba"),
+    );
+    const rest = edges.filter(
+      (e) => !FEATURED_SLUGS.has(e.node.slug) && !e.node.category?.slug?.includes("beba"),
+    );
+    const beba = edges.filter((e) => e.node.category?.slug?.includes("beba"));
     products = [...featured, ...rest, ...beba];
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("Live products query failed, falling back to snapshot:", error);
+    const snap: SnapshotLight[] | null = loadCatalogSnapshot();
+    if (snap) {
+      const ordered = orderNodes(sortSnapshot(snap, sort));
+      products = ordered.map((p) => ({ node: toCardProduct(p) }));
+      fromSnapshot = true;
+    } else {
+      console.error("No catalog snapshot available at public/catalog/catalog.json");
+    }
   }
 
   return (
@@ -54,12 +109,15 @@ export default async function ProductsPage({
         ) : (
           <>
             <div className="mt-10 flex items-center justify-between">
-              <p className="text-sm text-gray-500">{products.length} prints</p>
+              <p className="text-sm text-gray-500" data-catalog-source={fromSnapshot ? "snapshot" : "live"}>
+                {products.length} prints
+                {fromSnapshot && " · cached view — verifying live prices…"}
+              </p>
               <SortSelect current={sort} />
             </div>
             <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4 xl:gap-x-8">
-              {products.map(({ node }) => (
-                <ProductCard key={node.id} product={node} />
+              {products.map(({ node }, i) => (
+                <ProductCard key={node.id} product={node} priority={i < 4} />
               ))}
             </div>
           </>

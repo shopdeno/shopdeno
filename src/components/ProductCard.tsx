@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { productDisplayName } from "@/lib/site-config";
-import { getBlurDataURL } from "@/lib/imageUtils";
+import { getBlurDataURL, sizedImageUrl } from "@/lib/imageUtils";
 
 export interface ProductCardProduct {
   id: string;
@@ -23,18 +23,34 @@ function formatPrice(amount: number, currency: string) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
 }
 
-export function ProductCard({ product }: { product: ProductCardProduct }) {
+export function ProductCard({
+  product,
+  priority = false,
+}: {
+  product: ProductCardProduct;
+  /** Set for above-the-fold tiles only — eager-loads the image (LCP). */
+  priority?: boolean;
+}) {
   const price = product.pricing?.priceRange?.start?.gross;
   const originalPrice = product.pricing?.priceRangeUndiscounted?.start?.gross;
   const hasDiscount = originalPrice && price && originalPrice.amount > price.amount;
 
+  // Grid tiles show ONE image: prefer the sized thumbnail (512px) over full
+  // originals. Saleor `media.url` / variant media are unsized originals
+  // (up to 4096px in this catalog) — resized via Supabase transforms when
+  // they are Supabase direct URLs, so tiles stay ~30KB and cold-start-immune.
   const images = useMemo(() => {
-    const variantImgs = (product.variants ?? [])
-      .flatMap(v => v.media ?? [])
-      .filter((img, i, arr) => arr.findIndex(x => x.url === img.url) === i);
-    if (variantImgs.length) return variantImgs;
-    if (product.media?.length) return product.media;
-    return product.thumbnail ? [product.thumbnail] : [];
+    const seen = new Set<string>();
+    const out: { url: string; alt?: string }[] = [];
+    const push = (img?: { url: string; alt?: string } | null) => {
+      if (!img?.url || seen.has(img.url)) return;
+      seen.add(img.url);
+      out.push({ url: sizedImageUrl(img.url, 512), alt: img.alt });
+    };
+    push(product.thumbnail);
+    for (const img of product.media ?? []) push(img);
+    for (const v of product.variants ?? []) for (const img of v.media ?? []) push(img);
+    return out;
   }, [product.variants, product.media, product.thumbnail]);
 
   // Determine if we have a generated GIF for this product (multiple images)
@@ -60,7 +76,10 @@ export function ProductCard({ product }: { product: ProductCardProduct }) {
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover object-center"
-            priority
+            priority={priority}
+            loading={priority ? undefined : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+            placeholder="blur"
             blurDataURL={getBlurDataURL()}
           />
         ) : (
@@ -79,6 +98,7 @@ export function ProductCard({ product }: { product: ProductCardProduct }) {
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className={`object-cover object-center absolute inset-0 transition-opacity duration-200 ${showHover ? "opacity-100" : "opacity-0"}`}
             unoptimized
+            loading="lazy"
           />
         )}
       </div>

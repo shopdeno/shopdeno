@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test:e2e": "playwright test",
-    "generate-gifs": "node --env-file=.env scripts/generate-product-gifs.mjs"
+    "generate-gifs": "node --env-file=.env scripts/generate-product-gifs.mjs",
+    "catalog:snapshot": "node scripts/export-catalog-snapshot.mjs",
+    "saleor:ping": "node scripts/keepalive-saleor.mjs"
   },
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.2.0",

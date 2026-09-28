@@ -1,0 +1,1332 @@
+[
+ {
+  "id": "UHJvZHVjdDox",
+  "slug": "007-skyfall-rongao-sacco-4069",
+  "name": "007 Skyfall - Rongao Sacco",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_6fc623db_thumbnail_512.jpg",
+   "alt": "007 Skyfall - Rongao Sacco matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_6fc623db_thumbnail_4096.jpg",
+  "imageAlt": "007 Skyfall - Rongao Sacco matatu art print by Dennis Muraguri",
+  "categorySlug": "rongao-sacco",
+  "categoryName": "Rongao Sacco",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDoy",
+  "slug": "akuku-danger-4073",
+  "name": "Akuku Danger",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjI=/512/",
+   "alt": "Akuku Danger matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_9ab0dacf_thumbnail_4096.jpg",
+  "imageAlt": "Akuku Danger matatu art print by Dennis Muraguri",
+  "categorySlug": "random-mats",
+  "categoryName": "Random Mats",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDoz",
+  "slug": "alpine-route-100-kiambu",
+  "name": "Alpine Route 100",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjM=/512/",
+   "alt": "Alpine Route 100 green matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_ff23c904_thumbnail_4096.jpg",
+  "imageAlt": "Alpine Route 100 green matatu art print by Dennis Muraguri",
+  "categorySlug": "kiambu",
+  "categoryName": "Kiambu",
+  "mediaCount": 4
+ },
+ {
+  "id": "UHJvZHVjdDo1",
+  "slug": "amber-rose-side-view-kacose-sacco",
+  "name": "Amber Rose (Side View)",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE0/512/",
+   "alt": "Amber Rose (Side View)"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_908bdbf4_thumbnail_4096.jpg",
+  "imageAlt": "Amber Rose (Side View)",
+  "categorySlug": "kacose-sacco",
+  "categoryName": "Kacose Sacco",
+  "mediaCount": 4
+ },
+ {
+  "id": "UHJvZHVjdDo0",
+  "slug": "amber-rose-kacose-sacco-square-format",
+  "name": "Amber Rose [Square Format]",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjc=/512/",
+   "alt": "Amber Rose [Square Format]"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_b3cfc6db_thumbnail_4096.jpg",
+  "imageAlt": "Amber Rose [Square Format]",
+  "categorySlug": "kacose-sacco",
+  "categoryName": "Kacose Sacco",
+  "mediaCount": 7
+ },
+ {
+  "id": "UHJvZHVjdDo2",
+  "slug": "arafat-ongataline-sacco",
+  "name": "Arafat",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE4/512/",
+   "alt": "Arafat"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_512d43e1_thumbnail_4096.jpg",
+  "imageAlt": "Arafat",
+  "categorySlug": "ongata-line-sacco",
+  "categoryName": "Ongata Line Sacco",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDo3",
+  "slug": "astronauta-rongao-sacco",
+  "name": "Astronauta",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjIz/512/",
+   "alt": "Astronauta"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_4602016a_thumbnail_4096.jpg",
+  "imageAlt": "Astronauta",
+  "categorySlug": "rongao-sacco",
+  "categoryName": "Rongao Sacco",
+  "mediaCount": 6
+ },
+ {
+  "id": "UHJvZHVjdDo4",
+  "slug": "attitude-nmoa-sacco",
+  "name": "Attitude",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjI5/512/",
+   "alt": "Attitude"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_1839af3a_thumbnail_4096.jpg",
+  "imageAlt": "Attitude",
+  "categorySlug": "nmoa-sacco",
+  "categoryName": "NMOA Sacco",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDoxMA==",
+  "slug": "bash-kacose-sacco",
+  "name": "Bash",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjQ2/512/",
+   "alt": "Bash"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_dd3aa8ea_thumbnail_4096.jpg",
+  "imageAlt": "Bash",
+  "categorySlug": "random-mats",
+  "categoryName": "Random Mats",
+  "mediaCount": 6
+ },
+ {
+  "id": "UHJvZHVjdDo5",
+  "slug": "bash-2-kacose-sacco",
+  "name": "Bash II",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjM0/512/",
+   "alt": "Bash II"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_e867de32_thumbnail_4096.jpg",
+  "imageAlt": "Bash II",
+  "categorySlug": "kacose-sacco",
+  "categoryName": "Kacose Sacco",
+  "mediaCount": 12
+ },
+ {
+  "id": "UHJvZHVjdDoxMQ==",
+  "slug": "beat-port-ongata-line-transporters-4062",
+  "name": "Beat Port - Ongata Line Transporters",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjUy/512/",
+   "alt": "Beat Port - Ongata Line Transporters matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_c96a4b45_thumbnail_4096.jpg",
+  "imageAlt": "Beat Port - Ongata Line Transporters matatu art print by Dennis Muraguri",
+  "categorySlug": "ongata-line-transporters",
+  "categoryName": "Ongata Line Transporters",
+  "mediaCount": 2
+ },
+ {
+  "id": "UHJvZHVjdDoxMg==",
+  "slug": "beba-beba-4077",
+  "name": "Beba Beba",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjU0/512/",
+   "alt": "Beba Beba matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_b9f1da36_thumbnail_4096.jpg",
+  "imageAlt": "Beba Beba matatu art print by Dennis Muraguri",
+  "categorySlug": "random-mats",
+  "categoryName": "Random Mats",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDoxMw==",
+  "slug": "beba-beba-4081",
+  "name": "Beba Beba!",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjU1/512/",
+   "alt": "Beba Beba! matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_32cd1a90_thumbnail_4096.jpg",
+  "imageAlt": "Beba Beba! matatu art print by Dennis Muraguri",
+  "categorySlug": "beba",
+  "categoryName": "Beba",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDoxNA==",
+  "slug": "beba-bei",
+  "name": "Beba Bei",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjU2/512/",
+   "alt": "Beba Bei blue matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_11b3eb83_thumbnail_4096.jpg",
+  "imageAlt": "Beba Bei blue matatu art print by Dennis Muraguri",
+  "categorySlug": "beba",
+  "categoryName": "Beba",
+  "mediaCount": 3
+ },
+ {
+  "id": "UHJvZHVjdDoxNQ==",
+  "slug": "beba-eighteh-4085",
+  "name": "Beba Eighteh!",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjU5/512/",
+   "alt": "Beba Eighteh! green matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_eb91b71d_thumbnail_4096.jpg",
+  "imageAlt": "Beba Eighteh! green matatu art print by Dennis Muraguri",
+  "categorySlug": "beba",
+  "categoryName": "Beba",
+  "mediaCount": 2
+ },
+ {
+  "id": "UHJvZHVjdDoxNg==",
+  "slug": "beba-forteh",
+  "name": "Beba Forteh",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjYx/512/",
+   "alt": "Beba Forteh purple matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_c9c32396_thumbnail_4096.jpg",
+  "imageAlt": "Beba Forteh purple matatu art print by Dennis Muraguri",
+  "categorySlug": "beba",
+  "categoryName": "Beba",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDoxNw==",
+  "slug": "beba-kindeh-4080",
+  "name": "Beba Kindeh!",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjYy/512/",
+   "alt": "Beba Kindeh! blue matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_1b550686_thumbnail_4096.jpg",
+  "imageAlt": "Beba Kindeh! blue matatu art print by Dennis Muraguri",
+  "categorySlug": "beba",
+  "categoryName": "Beba",
+  "mediaCount": 3
+ },
+ {
+  "id": "UHJvZHVjdDoxOA==",
+  "slug": "beba-mbao",
+  "name": "Beba Mbao",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjY1/512/",
+   "alt": "Babe Mbao green matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_24a8977e_thumbnail_4096.jpg",
+  "imageAlt": "Babe Mbao green matatu art print by Dennis Muraguri",
+  "categorySlug": "beba",
+  "categoryName": "Beba",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDoxOQ==",
+  "slug": "beba-sabini-4083",
+  "name": "Beba Sabini!",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjY2/512/",
+   "alt": "Beba Sabini! pink matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_cd7a4ce4_thumbnail_4096.jpg",
+  "imageAlt": "Beba Sabini! pink matatu art print by Dennis Muraguri",
+  "categorySlug": "beba",
+  "categoryName": "Beba",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDoyMA==",
+  "slug": "beba-salasa-4082",
+  "name": "Beba Salasa!",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjY3/512/",
+   "alt": "Beba Salasa! blue matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_b719860b_thumbnail_4096.jpg",
+  "imageAlt": "Beba Salasa! blue matatu art print by Dennis Muraguri",
+  "categorySlug": "beba",
+  "categoryName": "Beba",
+  "mediaCount": 2
+ },
+ {
+  "id": "UHJvZHVjdDoyMQ==",
+  "slug": "beba-soh-4087",
+  "name": "Beba Soh!",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjY5/512/",
+   "alt": "Beba Soh! blue matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_1a89dd68_thumbnail_4096.jpg",
+  "imageAlt": "Beba Soh! blue matatu art print by Dennis Muraguri",
+  "categorySlug": "beba",
+  "categoryName": "Beba",
+  "mediaCount": 2
+ },
+ {
+  "id": "UHJvZHVjdDoyMg==",
+  "slug": "beba-stini-4084",
+  "name": "Beba Stini!",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjcx/512/",
+   "alt": "Beba Stini! green matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_61fdae94_thumbnail_4096.jpg",
+  "imageAlt": "Beba Stini! green matatu art print by Dennis Muraguri",
+  "categorySlug": "beba",
+  "categoryName": "Beba",
+  "mediaCount": 2
+ },
+ {
+  "id": "UHJvZHVjdDoyMw==",
+  "slug": "beba-tisini-4086",
+  "name": "Beba Tisini!",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjcz/512/",
+   "alt": "Beba Tisini! black matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_96eead12_thumbnail_4096.jpg",
+  "imageAlt": "Beba Tisini! black matatu art print by Dennis Muraguri",
+  "categorySlug": "beba",
+  "categoryName": "Beba",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDoyNA==",
+  "slug": "boom-box-snowball-sacco",
+  "name": "Boom Box",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjc4/512/",
+   "alt": "Boom Box"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_80d954e7_thumbnail_4096.jpg",
+  "imageAlt": "Boom Box",
+  "categorySlug": "snowball-sacco",
+  "categoryName": "Snowball Sacco",
+  "mediaCount": 4
+ },
+ {
+  "id": "UHJvZHVjdDoyNQ==",
+  "slug": "borussia-dortmund-oromats-sacco",
+  "name": "Borussia Dortmund",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjgy/512/",
+   "alt": "Borussia Dortmund"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_3b2616fe_thumbnail_4096.jpg",
+  "imageAlt": "Borussia Dortmund",
+  "categorySlug": "oromats-sacco",
+  "categoryName": "Oromats Sacco",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDoyNg==",
+  "slug": "boss-eastleigh-commuter-sacco",
+  "name": "Boss",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjg3/512/",
+   "alt": "Boss matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_fb3c553b_thumbnail_4096.jpg",
+  "imageAlt": "Boss matatu art print by Dennis Muraguri",
+  "categorySlug": "eastleigh-commuter-sacco",
+  "categoryName": "Eastleigh Commuter Sacco",
+  "mediaCount": 2
+ },
+ {
+  "id": "UHJvZHVjdDoyOA==",
+  "slug": "chicago-bulls-expresso-sacco",
+  "name": "Chicago Bulls - Expresso Sacco",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjg5/512/",
+   "alt": "Chicago Bulls - Expresso Sacco blue matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_eba5f484_thumbnail_4096.jpg",
+  "imageAlt": "Chicago Bulls - Expresso Sacco blue matatu art print by Dennis Muraguri",
+  "categorySlug": "expresso-sacco",
+  "categoryName": "Expresso Sacco",
+  "mediaCount": 2
+ },
+ {
+  "id": "UHJvZHVjdDoyNw==",
+  "slug": "c-roc-4064",
+  "name": "Cîroc",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjkx/512/",
+   "alt": "C ROC blue matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_a2b2dd79_thumbnail_4096.jpg",
+  "imageAlt": "C ROC blue matatu art print by Dennis Muraguri",
+  "categorySlug": "route-58",
+  "categoryName": "Route 58",
+  "mediaCount": 3
+ },
+ {
+  "id": "UHJvZHVjdDoyOQ==",
+  "slug": "deathrow-ongata-line-sacco",
+  "name": "Deathrow",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjk0/512/",
+   "alt": "Deathrow Orange matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_6efae6ea_thumbnail_4096.jpg",
+  "imageAlt": "Deathrow Orange matatu art print by Dennis Muraguri",
+  "categorySlug": "ongata-line-sacco",
+  "categoryName": "Ongata Line Sacco",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDozMA==",
+  "slug": "dexter-umo-inner-sacco",
+  "name": "Dexter",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjk5/512/",
+   "alt": "Dexter"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_5a7730e7_thumbnail_4096.jpg",
+  "imageAlt": "Dexter",
+  "categorySlug": "kmos-sacco",
+  "categoryName": "KMOS Sacco",
+  "mediaCount": 6
+ },
+ {
+  "id": "UHJvZHVjdDozMQ==",
+  "slug": "dexxy-ongata-line-sacco",
+  "name": "Dexxy",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjEwNQ==/512/",
+   "alt": "Dexxy"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_4ff8f11c_thumbnail_4096.jpg",
+  "imageAlt": "Dexxy",
+  "categorySlug": "ongata-line-sacco",
+  "categoryName": "Ongata Line Sacco",
+  "mediaCount": 7
+ },
+ {
+  "id": "UHJvZHVjdDozMg==",
+  "slug": "divas-route-125-4076",
+  "name": "Divas - Route 125",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjExMg==/512/",
+   "alt": "Divas - Route 125 blue matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_8fcc5809_thumbnail_4096.jpg",
+  "imageAlt": "Divas - Route 125 blue matatu art print by Dennis Muraguri",
+  "categorySlug": "route-125",
+  "categoryName": "Route 125",
+  "mediaCount": 6
+ },
+ {
+  "id": "UHJvZHVjdDozMw==",
+  "slug": "don-t-shoot-4041",
+  "name": "Don't Shoot!",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjExOA==/512/",
+   "alt": "Don't Shoot! Blue matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_e15b6846_thumbnail_4096.jpg",
+  "imageAlt": "Don't Shoot! Blue matatu art print by Dennis Muraguri",
+  "categorySlug": "dennis-muraguri-matatu-woodcut-prints-reproductions-on-paper",
+  "categoryName": "Dennis Muraguri Matatu Woodcut Prints (Reproductions On Paper)",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDozNA==",
+  "slug": "dreamland-ongata-line-sacco-4070",
+  "name": "Dreamland - Ongata Line Sacco",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjEyMw==/512/",
+   "alt": "Dreamland - Ongata Line Sacco matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_58971c93_thumbnail_4096.jpg",
+  "imageAlt": "Dreamland - Ongata Line Sacco matatu art print by Dennis Muraguri",
+  "categorySlug": "landscape-format",
+  "categoryName": "Landscape Format",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDozNQ==",
+  "slug": "ecko-unltd-ongata-line-transporters",
+  "name": "Eckō Unltd",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjEyNA==/512/",
+   "alt": "Eckō Unltd"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_e5abe374_thumbnail_4096.jpg",
+  "imageAlt": "Eckō Unltd",
+  "categorySlug": "ongata-line-transporters",
+  "categoryName": "Ongata Line Transporters",
+  "mediaCount": 3
+ },
+ {
+  "id": "UHJvZHVjdDozNg==",
+  "slug": "ferrari-route-8-4071",
+  "name": "Ferrari - Route 8",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjEyNw==/512/",
+   "alt": "Ferrari - Route 8 matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_e0f3a8cf_thumbnail_4096.jpg",
+  "imageAlt": "Ferrari - Route 8 matatu art print by Dennis Muraguri",
+  "categorySlug": "landscape-format",
+  "categoryName": "Landscape Format",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDozNw==",
+  "slug": "ferrari-umo-inner-sacco-4065",
+  "name": "Ferrari - Umoinner Sacco",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjEyOA==/512/",
+   "alt": "Ferrari - Umoinner Sacco green matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_3ac0b3e6_thumbnail_4096.jpg",
+  "imageAlt": "Ferrari - Umoinner Sacco green matatu art print by Dennis Muraguri",
+  "categorySlug": "square-format",
+  "categoryName": "Square Format",
+  "mediaCount": 2
+ },
+ {
+  "id": "UHJvZHVjdDozOA==",
+  "slug": "gangsta-limo-luminous-sacco-square-format",
+  "name": "Gangsta Limo [Square Format]",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjEzMA==/512/",
+   "alt": "Gangsta Limo [Square Format]"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_db8c04cf_thumbnail_4096.jpg",
+  "imageAlt": "Gangsta Limo [Square Format]",
+  "categorySlug": "luminous-sacco",
+  "categoryName": "Luminous Sacco",
+  "mediaCount": 7
+ },
+ {
+  "id": "UHJvZHVjdDozOQ==",
+  "slug": "gaza-mi-seh",
+  "name": "Gaza Mi Seh!!!",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjEzNw==/512/",
+   "alt": "Boss"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_ff574c2a_thumbnail_4096.jpg",
+  "imageAlt": "Boss",
+  "categorySlug": "eastleigh-commuter-sacco",
+  "categoryName": "Eastleigh Commuter Sacco",
+  "mediaCount": 4
+ },
+ {
+  "id": "UHJvZHVjdDo0MA==",
+  "slug": "gor-biro-ongata-line-transporters-4052",
+  "name": "Gor Biro - Ongata Line Transporters",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE0MQ==/512/",
+   "alt": "Gor Biro matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_2a5d760e_thumbnail_4096.jpg",
+  "imageAlt": "Gor Biro matatu art print by Dennis Muraguri",
+  "categorySlug": "ongata-line-transporters",
+  "categoryName": "Ongata Line Transporters",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDo0MQ==",
+  "slug": "jah-messenger-alicia-pakin-sacco",
+  "name": "Jah Messenger",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE0Mg==/512/",
+   "alt": "Jah Messenger matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_841c79c0_thumbnail_4096.jpg",
+  "imageAlt": "Jah Messenger matatu art print by Dennis Muraguri",
+  "categorySlug": "alicia-pakin-sacco",
+  "categoryName": "Alicia Pakin Sacco",
+  "mediaCount": 6
+ },
+ {
+  "id": "UHJvZHVjdDo0Mg==",
+  "slug": "kifaru-two-rongao-sacco",
+  "name": "Kifaru II",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE0OA==/512/",
+   "alt": "Kifaru II"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_b780e051_thumbnail_4096.jpg",
+  "imageAlt": "Kifaru II",
+  "categorySlug": "rongao-sacco",
+  "categoryName": "Rongao Sacco",
+  "mediaCount": 7
+ },
+ {
+  "id": "UHJvZHVjdDo0Mw==",
+  "slug": "kobe-expresso-sacco",
+  "name": "Kobe",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE1NQ==/512/",
+   "alt": "Kobe"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_bcc24c9e_thumbnail_4096.jpg",
+  "imageAlt": "Kobe",
+  "categorySlug": "expresso-sacco",
+  "categoryName": "Expresso Sacco",
+  "mediaCount": 7
+ },
+ {
+  "id": "UHJvZHVjdDo0NA==",
+  "slug": "krooks-4057",
+  "name": "Krooks",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE2Mg==/512/",
+   "alt": "Krooks matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_aa57b3ea_thumbnail_4096.jpg",
+  "imageAlt": "Krooks matatu art print by Dennis Muraguri",
+  "categorySlug": "umo-inner-sacco",
+  "categoryName": "Umoinner Sacco",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDo0NQ==",
+  "slug": "kudandia-4058",
+  "name": "Kudandia",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE2Mw==/512/",
+   "alt": "Kudandia orange matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_2615acd7_thumbnail_4096.jpg",
+  "imageAlt": "Kudandia orange matatu art print by Dennis Muraguri",
+  "categorySlug": "random-mats",
+  "categoryName": "Random Mats",
+  "mediaCount": 2
+ },
+ {
+  "id": "UHJvZHVjdDo0Ng==",
+  "slug": "lakers-kacose-sacco",
+  "name": "Lakers",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE2NQ==/512/",
+   "alt": "Lakers"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_1c04b516_thumbnail_4096.jpg",
+  "imageAlt": "Lakers",
+  "categorySlug": "kacose-sacco",
+  "categoryName": "Kacose Sacco",
+  "mediaCount": 4
+ },
+ {
+  "id": "UHJvZHVjdDo0Nw==",
+  "slug": "lamborghini-route-15-4066",
+  "name": "Lamborghini - Route 15",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE2OQ==/512/",
+   "alt": "Lamborghini Route 15 matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_29f34c63_thumbnail_4096.jpg",
+  "imageAlt": "Lamborghini Route 15 matatu art print by Dennis Muraguri",
+  "categorySlug": "route-15",
+  "categoryName": "Route 15",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDo0OA==",
+  "slug": "last-kings-ongataline-sacco",
+  "name": "Last Kings",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE3MA==/512/",
+   "alt": "Last Kings matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_f4a9435a_thumbnail_4096.jpg",
+  "imageAlt": "Last Kings matatu art print by Dennis Muraguri",
+  "categorySlug": "ongata-line-sacco",
+  "categoryName": "Ongata Line Sacco",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDo0OQ==",
+  "slug": "malcom-x-ngong-matatu-oa-4048",
+  "name": "Malcom X - Ngong Matatu OA",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE3MQ==/512/",
+   "alt": "Malcolm X - Ngong Sacco purple matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_f10a15d1_thumbnail_4096.jpg",
+  "imageAlt": "Malcolm X - Ngong Sacco purple matatu art print by Dennis Muraguri",
+  "categorySlug": "ngong-matatu-oa",
+  "categoryName": "Ngong Matatu OA",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDo1MA==",
+  "slug": "marley-fastrack-u-sacco",
+  "name": "Marley",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE3Ng==/512/",
+   "alt": "Marley"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_d582ff61_thumbnail_4096.jpg",
+  "imageAlt": "Marley",
+  "categorySlug": "fastrack-u-sacco",
+  "categoryName": "Fastrack .U. Sacco",
+  "mediaCount": 6
+ },
+ {
+  "id": "UHJvZHVjdDo1MQ==",
+  "slug": "matatu-and-tractor",
+  "name": "Matatu and Tractor",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE4Mg==/512/",
+   "alt": "Matatu and Tractor"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_8b1078dc_thumbnail_4096.jpg",
+  "imageAlt": "Matatu and Tractor",
+  "categorySlug": "random-mats",
+  "categoryName": "Random Mats",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDo1Mg==",
+  "slug": "matatu-for-president-kacose-sacco",
+  "name": "Matatu for President",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE4Nw==/512/",
+   "alt": "Matatu for President"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_0b035ed1_thumbnail_4096.jpg",
+  "imageAlt": "Matatu for President",
+  "categorySlug": "kacose-sacco",
+  "categoryName": "Kacose Sacco",
+  "mediaCount": 3
+ },
+ {
+  "id": "UHJvZHVjdDo1Mw==",
+  "slug": "matuta-kacose-sacco",
+  "name": "Matuta",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE5MA==/512/",
+   "alt": "Matuta"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_ad6f50cb_thumbnail_4096.jpg",
+  "imageAlt": "Matuta",
+  "categorySlug": "kacose-sacco",
+  "categoryName": "Kacose Sacco",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDo1NA==",
+  "slug": "maybach-oromats-sacco",
+  "name": "Maybach",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE5NQ==/512/",
+   "alt": "Maybach matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_1f10999d_thumbnail_4096.jpg",
+  "imageAlt": "Maybach matatu art print by Dennis Muraguri",
+  "categorySlug": "oromats-sacco",
+  "categoryName": "Oromats Sacco",
+  "mediaCount": 4
+ },
+ {
+  "id": "UHJvZHVjdDo1NQ==",
+  "slug": "minion-ebet-sacco-4046",
+  "name": "Minion - EBET Sacco",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjE5OQ==/512/",
+   "alt": "Minion - EBET Sacco matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_d6fd94c6_thumbnail_4096.jpg",
+  "imageAlt": "Minion - EBET Sacco matatu art print by Dennis Muraguri",
+  "categorySlug": "ebet-sacco",
+  "categoryName": "EBET Sacco",
+  "mediaCount": 6
+ },
+ {
+  "id": "UHJvZHVjdDo1Ng==",
+  "slug": "ooops-ongata-line-sacco",
+  "name": "Ooops",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjIwNQ==/512/",
+   "alt": "Ooops matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_ce7cdccf_thumbnail_4096.jpg",
+  "imageAlt": "Ooops matatu art print by Dennis Muraguri",
+  "categorySlug": "ongata-line-sacco",
+  "categoryName": "Ongata Line Sacco",
+  "mediaCount": 7
+ },
+ {
+  "id": "UHJvZHVjdDo1Nw==",
+  "slug": "pablo-ongata-line-sacco",
+  "name": "Pablo",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjIxMg==/512/",
+   "alt": "Pablo matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_9fc54470_thumbnail_4096.jpg",
+  "imageAlt": "Pablo matatu art print by Dennis Muraguri",
+  "categorySlug": "ongata-line-sacco",
+  "categoryName": "Ongata Line Sacco",
+  "mediaCount": 6
+ },
+ {
+  "id": "UHJvZHVjdDo1OA==",
+  "slug": "pig-society-rog-sacco-4047",
+  "name": "Pig Society - ROG Sacco",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjIxOA==/512/",
+   "alt": "Pig Society - ROG Sacco matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_7793ca04_thumbnail_4096.jpg",
+  "imageAlt": "Pig Society - ROG Sacco matatu art print by Dennis Muraguri",
+  "categorySlug": "rog-sacco",
+  "categoryName": "ROG Sacco",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDo1OQ==",
+  "slug": "rasha-route-125-4067",
+  "name": "Rasha - Route 125",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjIyMw==/512/",
+   "alt": "Rasha - Route 125 matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_bed36712_thumbnail_4096.jpg",
+  "imageAlt": "Rasha - Route 125 matatu art print by Dennis Muraguri",
+  "categorySlug": "route-125",
+  "categoryName": "Route 125",
+  "mediaCount": 2
+ },
+ {
+  "id": "UHJvZHVjdDo2MA==",
+  "slug": "red-devils-fergie-rt-125",
+  "name": "Red Devils Fergie",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjIyNQ==/512/",
+   "alt": "Red Devils Fergie matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_1bdc67e1_thumbnail_4096.jpg",
+  "imageAlt": "Red Devils Fergie matatu art print by Dennis Muraguri",
+  "categorySlug": "route-125",
+  "categoryName": "Route 125",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDo2MQ==",
+  "slug": "rich-gang-south-b-owners-sacco",
+  "name": "Rich Gang",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjIyNg==/512/",
+   "alt": "Rich Gang matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_604459e3_thumbnail_4096.jpg",
+  "imageAlt": "Rich Gang matatu art print by Dennis Muraguri",
+  "categorySlug": "south-b-owners-sacco",
+  "categoryName": "South B Owners Sacco",
+  "mediaCount": 8
+ },
+ {
+  "id": "UHJvZHVjdDo2Mg==",
+  "slug": "salt-n-peppa-expresso-sacco",
+  "name": "Salt n Peppa - Expresso Sacco",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjIzNA==/512/",
+   "alt": "Salt n Peppa - Expresso Sacco matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_f1a8e3be_thumbnail_4096.jpg",
+  "imageAlt": "Salt n Peppa - Expresso Sacco matatu art print by Dennis Muraguri",
+  "categorySlug": "expresso-sacco",
+  "categoryName": "Expresso Sacco",
+  "mediaCount": 4
+ },
+ {
+  "id": "UHJvZHVjdDo2Mw==",
+  "slug": "schizophrenic-ongata-line-sacco",
+  "name": "Schizophrenic",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjIzOA==/512/",
+   "alt": "Schizophrenic matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_602e5a97_thumbnail_4096.jpg",
+  "imageAlt": "Schizophrenic matatu art print by Dennis Muraguri",
+  "categorySlug": "ongata-line-sacco",
+  "categoryName": "Ongata Line Sacco",
+  "mediaCount": 6
+ },
+ {
+  "id": "UHJvZHVjdDo2NA==",
+  "slug": "schizophrenic-ongata-line-sacco-square-format",
+  "name": "Schizophrenic [Square Format]",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjI0NA==/512/",
+   "alt": "Schizophrenic [Square Format] matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_adfb7ba8_thumbnail_4096.jpg",
+  "imageAlt": "Schizophrenic [Square Format] matatu art print by Dennis Muraguri",
+  "categorySlug": "ongata-line-sacco",
+  "categoryName": "Ongata Line Sacco",
+  "mediaCount": 6
+ },
+ {
+  "id": "UHJvZHVjdDo2NQ==",
+  "slug": "scorpio-ongata-line-sacco",
+  "name": "Scorpio",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjI1MA==/512/",
+   "alt": "Scorpio matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_6ca22cdc_thumbnail_4096.jpg",
+  "imageAlt": "Scorpio matatu art print by Dennis Muraguri",
+  "categorySlug": "metro-class-sacco",
+  "categoryName": "Metro Class Sacco",
+  "mediaCount": 4
+ },
+ {
+  "id": "UHJvZHVjdDo2Ng==",
+  "slug": "steel-pulse-rog-sacco",
+  "name": "Steel Pulse",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjI1NA==/512/",
+   "alt": "Steel Pulse matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_43bd7509_thumbnail_4096.jpg",
+  "imageAlt": "Steel Pulse matatu art print by Dennis Muraguri",
+  "categorySlug": "rog-sacco",
+  "categoryName": "ROG Sacco",
+  "mediaCount": 7
+ },
+ {
+  "id": "UHJvZHVjdDo2Nw==",
+  "slug": "sugar-rongao-sacco",
+  "name": "Sugar - Rongao Sacco",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_bba3fefa_thumbnail_512.jpg",
+   "alt": "Sugar - Rongao Sacco matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_bba3fefa_thumbnail_4096.jpg",
+  "imageAlt": "Sugar - Rongao Sacco matatu art print by Dennis Muraguri",
+  "categorySlug": "rongao-sacco",
+  "categoryName": "Rongao Sacco",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDo2OA==",
+  "slug": "the-money-team-umo-inner-sacco-4053",
+  "name": "TMT (The Money Team) - Umoinner Sacco",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjI2Ng==/512/",
+   "alt": "TMT (The Money Team) - Umoinner Sacco matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_ce1b7a66_thumbnail_4096.jpg",
+  "imageAlt": "TMT (The Money Team) - Umoinner Sacco matatu art print by Dennis Muraguri",
+  "categorySlug": "umo-inner-sacco",
+  "categoryName": "Umoinner Sacco",
+  "mediaCount": 1
+ },
+ {
+  "id": "UHJvZHVjdDo2OQ==",
+  "slug": "warembo-bila-make-up-4051",
+  "name": "Warembo Bila - Make-Up",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjI2Nw==/512/",
+   "alt": "Warembo Bila - Make-Up matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_d3fbbe13_thumbnail_4096.jpg",
+  "imageAlt": "Warembo Bila - Make-Up matatu art print by Dennis Muraguri",
+  "categorySlug": "make-up",
+  "categoryName": "Make-Up",
+  "mediaCount": 5
+ },
+ {
+  "id": "UHJvZHVjdDo3MA==",
+  "slug": "wizzy-pin-point-sacco-4054",
+  "name": "Wizzy - Pin Point Sacco",
+  "price": {
+   "amount": 50,
+   "currency": "USD"
+  },
+  "originalPrice": null,
+  "thumbnail": {
+   "url": "https://shopdeno-saleor-api.onrender.com/thumbnail/UHJvZHVjdE1lZGlhOjI3Mg==/512/",
+   "alt": "Wizzy - Pin Point Sacco matatu art print by Dennis Muraguri"
+  },
+  "imageUrl": "https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media/thumbnails/products/image_7a8b0c65_thumbnail_4096.jpg",
+  "imageAlt": "Wizzy - Pin Point Sacco matatu art print by Dennis Muraguri",
+  "categorySlug": "pin-point-sacco",
+  "categoryName": "Pin Point Sacco",
+  "mediaCount": 1
+ }
+]

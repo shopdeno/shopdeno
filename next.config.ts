@@ -58,6 +58,12 @@ const nextConfig: NextConfig = {
         hostname: "localhost",
         port: "8000",
       },
+      // Self-hosted Saleor media: Supabase Storage (S3-compat public bucket).
+      // Required by next/image even with unoptimized:true for src validation.
+      {
+        protocol: "https",
+        hostname: "**.supabase.co",
+      },
     ],
   },
 };

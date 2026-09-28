@@ -7,7 +7,7 @@ import { useCart } from "@/context/CartContext";
 import { ChevronLeft, ChevronRight, X, Check, Loader2, ShoppingCart, Heart, Truck, Clock, Share2, MapPin } from "lucide-react";
 import { ProductCard, type ProductCardProduct } from "@/components/ProductCard";
 import { productDisplayName } from "@/lib/site-config";
-import { getBlurDataURL } from "@/lib/imageUtils";
+import { getBlurDataURL, sizedImageUrl } from "@/lib/imageUtils";
 
 // Client-side color name → hex fallback for DROPDOWN Color attribute
 // (Saleor DROPDOWN type stores no hex; value.value is empty)
@@ -154,9 +154,11 @@ interface Product {
 interface ProductDetailClientProps {
   product: Product;
   relatedProducts?: ProductCardProduct[];
+  /** True when rendered from the static snapshot because live Saleor was unreachable. */
+  snapshotNotice?: boolean;
 }
 
-export function ProductDetailClient({ product, relatedProducts = [] }: ProductDetailClientProps) {
+export function ProductDetailClient({ product, relatedProducts = [], snapshotNotice = false }: ProductDetailClientProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(() => product.variants[0] ?? null);
@@ -330,6 +332,11 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+        {snapshotNotice && (
+          <p className="mb-4 rounded-lg bg-amber-50 px-4 py-2 text-sm text-amber-800" data-catalog-source="snapshot">
+            Cached view — verifying live availability…
+          </p>
+        )}
         {/* Breadcrumb */}
         <nav className="flex mb-8">
           <ol className="flex items-center space-x-2">
@@ -364,13 +371,15 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
             >
               {sortedProductImages[selectedImage] ? (
                 <Image
-                  src={sortedProductImages[selectedImage].url}
+                  src={sizedImageUrl(sortedProductImages[selectedImage].url, 1024)}
                   alt={sortedProductImages[selectedImage].alt || product.name}
                   width={0}
                   height={0}
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="w-full h-auto"
                   priority
+                  fetchPriority="high"
+                  placeholder="blur"
                   blurDataURL={getBlurDataURL()}
                 />
               ) : (
@@ -398,7 +407,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: ProductDe
                       }`}
                       style={isActive || isHovered ? { borderColor: thumbColor } : undefined}
                     >
-                      <Image src={image.url} alt={image.alt || `${product.name} ${idx + 1}`} fill className="object-cover" blurDataURL={getBlurDataURL()} />
+                      <Image src={sizedImageUrl(image.url, 256)} alt={image.alt || `${product.name} ${idx + 1}`} fill className="object-cover" loading="lazy" placeholder="blur" blurDataURL={getBlurDataURL()} />
                     </button>
                   );
                 })}

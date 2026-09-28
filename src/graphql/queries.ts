@@ -60,7 +60,7 @@ export const PRODUCTS_QUERY = gql`
           slug
           seoDescription
           rating
-          thumbnail(size: 1024) {
+          thumbnail(size: 512) {
             url
             alt
           }
@@ -114,7 +114,7 @@ export const RELATED_PRODUCTS_QUERY = gql`
           id
           name
           slug
-          thumbnail(size: 1024) {
+          thumbnail(size: 512) {
             url
             alt
           }
@@ -191,7 +191,7 @@ export const PRODUCT_DETAIL_QUERY = gql`
         url
         alt
       }
-      thumbnail {
+      thumbnail(size: 1024) {
         url
         alt
       }
@@ -339,7 +339,7 @@ export const SACCO_LANDING_QUERY = gql`
           products(first: 5, channel: $channel) {
             edges {
               node {
-                thumbnail(size: 1024) {
+                thumbnail(size: 512) {
                   url
                   alt
                 }

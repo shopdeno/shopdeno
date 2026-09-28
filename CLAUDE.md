@@ -15,6 +15,7 @@ npm run lint          # eslint (flat config)
 npx tsc --noEmit      # typecheck
 npm run test:e2e      # Playwright tests (testDir: ./tests — NOT ./e2e, see Gotchas)
 npm run generate-gifs # generate animated GIFs from multi-image products (needs .env)
+npm run catalog:snapshot # export Saleor catalog -> public/catalog/*.json (needs SALEOR_URL env; tolerates Render cold start)
 docker-compose up -d          # local Saleor (api :8000; db/redis internal-only)
 docker-compose logs -f api    # tail Saleor logs
 # Catalog migration (WooCommerce -> Saleor), staged + idempotent:
@@ -64,6 +65,11 @@ No unit/integration test runner. Env required: copy `.env.example` → `.env`, s
 - **Playwright testDir mismatch:** `playwright.config.ts` points to `./tests`, but `./e2e/` also contains spec files that won't run with `npm run test:e2e`. Add specs to `./tests/` if they should run in CI.
 - **Scaffold-only dirs:** `app/[channel]/*`, `app/api/auth`, `app/(cart)`, `app/(checkout)`, `src/ui/components/*`, `src/gql/`.
 - **GIF hover CSS pattern:** ProductCard always mounts the GIF `<Image>` in DOM with `opacity-0`/`opacity-100` class toggle (not conditional mount). Conditional mount causes `Node cannot be found in the current page` errors during rapid hover because next/image ref becomes stale.
+- **Cold-start immunity (Render free sleeps ~15min idle).** `/products` + `/products/[slug]` are ISR (`revalidate = 3600`) with live-first/8s-timeout/snapshot-fallback to `public/catalog/*.json` (see `src/lib/catalog-snapshot.ts`). Refresh via `npm run catalog:snapshot` (SALEOR_URL env) or the nightly `catalog-nightly-snapshot` workflow (needs `SALEOR_API_URL` repo secret). `/api/catalog/status` reports snapshot freshness. Checkout/cart stay live — prices re-checked server-side in `/api/checkout/complete`.
+- **Image URL policy.** Grid/PDP prefer sized bytes: `thumbnail(size: N)` returns direct Supabase 512px renditions once the worker has generated them (else a `/thumbnail/` proxy URL through sleeping Render — force https via `toHttps()`). Raw `media.url` originals are ~3000px/~600KB Supabase direct (cold-start-immune but huge) — always pass through `sizedImageUrl(url, width)` (`src/lib/imageUtils.ts`), which rewrites Supabase URLs to the `render/image` transform endpoint (verified 637KB→33KB at 512px). Grid `priority` only for the first 4 tiles.
+- **Raw GraphQL in node scripts:** `sortBy`/enums must be query VARIABLES — inlining `{field:"NAME"}` as quoted strings fails validation (`Expected type OrderDirection, found "ASC"`).
+- **Layout must not await Saleor past `LIVE_TIMEOUT_MS`.** `getMenu()` in `src/app/layout.tsx` is time-boxed via `src/lib/live-timeout.ts` (`withTimeout`) — an unbounded menu query would hold every page (including snapshot fallbacks) hostage during Render cold starts. Same urql rule: check `result.error`.
+- **Preconnects in root layout:** Supabase media host (hardcoded `SUPABASE_MEDIA_HOST`) + Saleor API origin (derived from env) save ~200-500ms DNS+TLS for first-time visitors.
 
 ## Conventions
 

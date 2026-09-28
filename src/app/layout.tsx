@@ -9,6 +9,8 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { getSaleorClient, getChannel } from "@/lib/saleor";
 import { MAIN_MENU_QUERY } from "@/graphql/queries";
 import { siteConfig } from "@/lib/site-config";
+import { SUPABASE_MEDIA_HOST } from "@/lib/imageUtils";
+import { LIVE_TIMEOUT_MS, withTimeout } from "@/lib/live-timeout";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -104,16 +106,31 @@ interface MenuItem {
 }
 
 async function getMenu() {
+  // Menu is non-critical chrome: never let a sleeping Saleor hold the whole
+  // layout (and every snapshot-fallback page) hostage past the timeout.
   try {
     const client = getSaleorClient();
     const channel = getChannel();
-    const result = await client.query(MAIN_MENU_QUERY, {
-      channel,
-    });
+    const result = await withTimeout(
+      client.query(MAIN_MENU_QUERY, { channel }).toPromise(),
+      LIVE_TIMEOUT_MS,
+      "main menu query",
+    );
+    if (result.error) throw result.error;
     return result.data?.menu?.items || [];
   } catch (error) {
-    console.error("Error fetching menu:", error);
+    console.error("Menu query failed, rendering without menu:", error);
     return [];
+  }
+}
+
+// Saleor API host for preconnect (derived from env; omitted if unparseable).
+function saleorApiOrigin(): string | null {
+  try {
+    const url = process.env.NEXT_PUBLIC_SALEOR_API_URL;
+    return url ? new URL(url).origin : null;
+  } catch {
+    return null;
   }
 }
 
@@ -123,10 +140,21 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const menuItems: MenuItem[] = await getMenu();
+  const apiOrigin = saleorApiOrigin();
 
   return (
     <html lang="en">
       <head>
+        {/* Early connections: images + API resolve before first paint, saving
+            ~200-500ms DNS+TLS for first-time visitors on image-heavy pages. */}
+        <link rel="preconnect" href={SUPABASE_MEDIA_HOST} crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href={SUPABASE_MEDIA_HOST} />
+        {apiOrigin && apiOrigin !== SUPABASE_MEDIA_HOST && (
+          <>
+            <link rel="preconnect" href={apiOrigin} />
+            <link rel="dns-prefetch" href={apiOrigin} />
+          </>
+        )}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
         <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
