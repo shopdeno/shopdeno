@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCheckout, type Address } from "@/context/CheckoutContext";
+import { getSaleorClient } from "@/lib/saleor";
+import { ADDRESS_VALIDATION_RULES_QUERY } from "@/graphql/checkout";
 import { PhoneInput } from "@/components/PhoneInput";
 import { siteConfig } from "@/lib/site-config";
 import { Check, Loader2, ChevronLeft, Building2, Truck } from "lucide-react";
@@ -79,6 +81,58 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
     phone: "",
   });
   const [deliveryIntent, setDeliveryIntent] = useState<"collect" | "ship" | null>(null);
+  // Per-country address rules from Saleor — control the State/Region field so we
+  // never submit a value the backend rejects for the selected country.
+  const [addrRules, setAddrRules] = useState<{
+    countryAreaChoices: { raw: string; verbose: string }[];
+    countryAreaAllowed: boolean;
+    countryAreaRequired: boolean;
+    countryAreaType: string;
+  }>({ countryAreaChoices: [], countryAreaAllowed: true, countryAreaRequired: false, countryAreaType: "state" });
+
+  useEffect(() => {
+    let cancelled = false;
+    const code = address.country.code;
+    if (!code) return;
+    (async () => {
+      try {
+        const client = getSaleorClient();
+        const result: any = await client.query(ADDRESS_VALIDATION_RULES_QUERY, { countryCode: code }).toPromise();
+        const rules = result.data?.addressValidationRules;
+        if (cancelled || !rules) return;
+        const allowed: string[] = rules.allowedFields ?? [];
+        const required: string[] = rules.requiredFields ?? [];
+        const choices: { raw: string; verbose: string }[] = rules.countryAreaChoices ?? [];
+        setAddrRules({
+          countryAreaChoices: choices,
+          countryAreaAllowed: allowed.includes("countryArea"),
+          countryAreaRequired: required.includes("countryArea"),
+          countryAreaType: rules.countryAreaType || "state",
+        });
+        // Drop a stale region value the newly-selected country won't accept —
+        // either it allows no country area, or the old value isn't a valid choice.
+        setAddress((prev) => {
+          if (!prev.countryArea) return prev;
+          if (!allowed.includes("countryArea")) return { ...prev, countryArea: "" };
+          if (choices.length > 0 && !choices.some((c) => c.raw === prev.countryArea)) {
+            return { ...prev, countryArea: "" };
+          }
+          return prev;
+        });
+      } catch {
+        // If rules can't load, fall back to a permissive free-text field.
+        if (!cancelled) {
+          setAddrRules({ countryAreaChoices: [], countryAreaAllowed: true, countryAreaRequired: false, countryAreaType: "state" });
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [address.country.code]);
+
+  const countryAreaLabel = addrRules.countryAreaType
+    ? addrRules.countryAreaType.charAt(0).toUpperCase() + addrRules.countryAreaType.slice(1)
+    : "State / Region";
+
   const [sameAsBilling, setSameAsBilling] = useState(true);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -306,7 +360,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -318,7 +372,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                       required
                       value={address.firstName}
                       onChange={(e) => setAddress({ ...address, firstName: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                     />
                   </div>
                   <div>
@@ -328,7 +382,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                       required
                       value={address.lastName}
                       onChange={(e) => setAddress({ ...address, lastName: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                     />
                   </div>
                 </div>
@@ -376,7 +430,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -390,7 +444,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                       required
                       value={address.firstName}
                       onChange={(e) => setAddress({ ...address, firstName: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                     />
                   </div>
                   <div>
@@ -400,7 +454,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                       required
                       value={address.lastName}
                       onChange={(e) => setAddress({ ...address, lastName: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                     />
                   </div>
                 </div>
@@ -411,7 +465,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                     type="text"
                     value={address.companyName || ""}
                     onChange={(e) => setAddress({ ...address, companyName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                   />
                 </div>
 
@@ -422,7 +476,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                     required
                     value={address.streetAddress1}
                     onChange={(e) => setAddress({ ...address, streetAddress1: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                     placeholder="Street address"
                   />
                 </div>
@@ -433,11 +487,11 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                     type="text"
                     value={address.streetAddress2 || ""}
                     onChange={(e) => setAddress({ ...address, streetAddress2: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className={`grid gap-4 mb-4 ${addrRules.countryAreaAllowed ? "grid-cols-3" : "grid-cols-2"}`}>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
                     <input
@@ -445,19 +499,37 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                       required
                       value={address.city}
                       onChange={(e) => setAddress({ ...address, city: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">State / Region</label>
-                    <input
-                      type="text"
-                      value={address.countryArea || ""}
-                      onChange={(e) => setAddress({ ...address, countryArea: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="e.g. NY"
-                    />
-                  </div>
+                  {addrRules.countryAreaAllowed && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {countryAreaLabel}{!addrRules.countryAreaRequired && " (optional)"}
+                      </label>
+                      {addrRules.countryAreaChoices.length > 0 ? (
+                        <select
+                          value={address.countryArea || ""}
+                          onChange={(e) => setAddress({ ...address, countryArea: e.target.value })}
+                          required={addrRules.countryAreaRequired}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                        >
+                          <option value="">Select {countryAreaLabel.toLowerCase()}…</option>
+                          {addrRules.countryAreaChoices.map((c) => (
+                            <option key={c.raw} value={c.raw}>{c.verbose}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          value={address.countryArea || ""}
+                          onChange={(e) => setAddress({ ...address, countryArea: e.target.value })}
+                          required={addrRules.countryAreaRequired}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
+                        />
+                      )}
+                    </div>
+                  )}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">ZIP / Postal Code</label>
                     <input
@@ -465,7 +537,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                       required
                       value={address.postalCode}
                       onChange={(e) => setAddress({ ...address, postalCode: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                     />
                   </div>
                 </div>
@@ -475,7 +547,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                   <select
                     value={address.country.code}
                     onChange={(e) => setAddress({ ...address, country: { code: e.target.value, country: e.target.value } })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                   >
                     {countries.length > 0
                       ? countries.map((c) => (

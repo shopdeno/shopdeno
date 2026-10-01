@@ -1,5 +1,24 @@
 import { gql } from "graphql-tag";
 
+// Per-country address rules from Saleor (backed by Google's i18n address data).
+// Drives the checkout form: which fields are allowed/required, and the valid
+// country-area (state/province/county) choices — so we never submit a value
+// Saleor will reject (e.g. a free-typed region for a country that has none).
+export const ADDRESS_VALIDATION_RULES_QUERY = gql`
+  query AddressValidationRules($countryCode: CountryCode!) {
+    addressValidationRules(countryCode: $countryCode) {
+      countryAreaType
+      postalCodeType
+      requiredFields
+      allowedFields
+      countryAreaChoices {
+        raw
+        verbose
+      }
+    }
+  }
+`;
+
 export const GET_CHECKOUT_QUERY = gql`
   query GetCheckout($checkoutId: ID!) {
     checkout(id: $checkoutId) {

@@ -15,6 +15,13 @@
   padding: 0.5rem 0.75rem;
   font-size: 1rem;
   font-family: inherit;
+  /* Force dark text — inputs otherwise inherit the dark-theme light foreground
+     (#ededed) and become invisible on their white background. */
+  color: #111827;
+}
+
+.phone-input-wrapper input::placeholder {
+  color: #9ca3af;
 }
 
 .phone-input-wrapper input:focus {
