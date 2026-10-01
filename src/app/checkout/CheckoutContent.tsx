@@ -684,21 +684,23 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                     </div>
                   )}
 
-                  <label className="flex items-start p-4 border border-gray-200 rounded-md cursor-pointer hover:border-indigo-500">
+                  <div className="flex items-start p-4 border border-gray-200 rounded-md opacity-50 cursor-not-allowed">
                     <input
                       type="radio"
                       name="payment"
-                      checked={paymentMethod === "paypal"}
-                      onChange={() => setPaymentMethod("paypal")}
+                      disabled
                       className="h-4 w-4 text-indigo-600 mt-0.5"
                     />
                     <span className="ml-3">
-                      PayPal
+                      <span className="flex items-center gap-2">
+                        PayPal
+                        <span className="text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">Coming soon</span>
+                      </span>
                       <span className="block text-xs text-gray-500">
                         Pay with PayPal, credit or debit card.
                       </span>
                     </span>
-                  </label>
+                  </div>
                 </div>
 
                 {orderError && (
