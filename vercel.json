@@ -3,12 +3,8 @@
   "framework": "nextjs",
   "crons": [
     {
-      "path": "/api/cron/keepalive",
-      "schedule": "*/12 * * * *"
-    },
-    {
       "path": "/api/cron/pesapal-reconcile",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 1 * * *"
     }
   ]
 }
