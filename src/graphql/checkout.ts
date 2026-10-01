@@ -134,6 +134,7 @@ export const UPDATE_CHECKOUT_BILLING_ONLY_MUTATION = gql`
       errors {
         field
         message
+        code
       }
     }
   }
@@ -151,6 +152,7 @@ export const UPDATE_CHECKOUT_ADDRESS_MUTATION = gql`
       errors {
         field
         message
+        code
       }
     }
     checkoutBillingAddressUpdate(
@@ -179,6 +181,7 @@ export const UPDATE_CHECKOUT_ADDRESS_MUTATION = gql`
       errors {
         field
         message
+        code
       }
     }
   }
@@ -194,6 +197,7 @@ export const UPDATE_CHECKOUT_EMAIL_MUTATION = gql`
       errors {
         field
         message
+        code
       }
     }
   }
@@ -241,6 +245,7 @@ export const UPDATE_DELIVERY_METHOD_MUTATION = gql`
       errors {
         field
         message
+        code
       }
     }
   }

@@ -87,6 +87,8 @@ export interface Checkout {
   deliveryMethod?: DeliveryMethod;
 }
 
+export type AddressFieldError = { field: string | null; message: string | null; code?: string | null };
+
 interface CheckoutContextType {
   checkout: Checkout | null;
   isLoading: boolean;
@@ -95,6 +97,8 @@ interface CheckoutContextType {
   setStep: (step: "information" | "shipping" | "payment" | "review") => void;
   paymentMethod: PaymentMethod;
   setPaymentMethod: (method: PaymentMethod) => void;
+  /** Validation errors from the last address update, for display in the form. */
+  addressErrors: AddressFieldError[];
   updateAddress: (address: Address, type: "shipping" | "billing", opts?: { skipStepChange?: boolean }) => Promise<Checkout | null>;
   updateBillingAddress: (address: Address) => Promise<Checkout | null>;
   updateEmail: (email: string) => Promise<void>;
@@ -110,6 +114,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
   const [isInitializing, setIsInitializing] = useState(true);
   const [step, setStep] = useState<"information" | "shipping" | "payment" | "review">("information");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("pickup");
+  const [addressErrors, setAddressErrors] = useState<AddressFieldError[]>([]);
 
   const client = getSaleorClient();
 
@@ -148,6 +153,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
     async (address: Address, _type: "shipping" | "billing", opts?: { skipStepChange?: boolean }): Promise<Checkout | null> => {
       if (!checkout) return null;
       setIsLoading(true);
+      setAddressErrors([]);
 
       try {
         // Map the UI Address (nested country object) to Saleor's AddressInput
@@ -176,6 +182,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         ];
         if (errors.length) {
           console.error("Error updating address:", errors);
+          setAddressErrors(errors);
           return null;
         }
 
@@ -187,6 +194,9 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         return fresh;
       } catch (error) {
         console.error("Error updating address:", error);
+        setAddressErrors([
+          { field: null, message: "Could not reach the server. Please try again.", code: null },
+        ]);
         return null;
       } finally {
         setIsLoading(false);
@@ -349,6 +359,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         setStep,
         paymentMethod,
         setPaymentMethod,
+        addressErrors,
         updateAddress,
         updateBillingAddress,
         updateEmail,

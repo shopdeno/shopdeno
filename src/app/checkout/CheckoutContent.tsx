@@ -17,6 +17,23 @@ interface Cart {
   subtotal: { gross: { amount: number; currency: string } };
 }
 
+// Maps Saleor AddressInput field names to human-readable labels for error display.
+const ADDRESS_FIELD_LABELS: Record<string, string> = {
+  firstName: "First name",
+  lastName: "Last name",
+  streetAddress1: "Address",
+  streetAddress2: "Apartment / suite",
+  city: "City",
+  countryArea: "State / Region",
+  postalCode: "ZIP / Postal code",
+  country: "Country",
+  phone: "Phone",
+};
+function formatAddressFieldName(field: string | null): string {
+  if (!field) return "Address";
+  return ADDRESS_FIELD_LABELS[field] ?? field;
+}
+
 export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Cart; countries?: { code: string; country: string }[] }) {
   const router = useRouter();
   const {
@@ -27,6 +44,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
     isInitializing,
     paymentMethod,
     setPaymentMethod,
+    addressErrors,
     updateAddress,
     updateBillingAddress,
     updateEmail,
@@ -57,7 +75,7 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
     city: "",
     countryArea: "",
     postalCode: "",
-    country: { code: "US", country: "United States" },
+    country: { code: "KE", country: "Kenya" },
     phone: "",
   });
   const [deliveryIntent, setDeliveryIntent] = useState<"collect" | "ship" | null>(null);
@@ -482,6 +500,19 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
                     defaultCountry="KE"
                   />
                 </div>
+
+                {addressErrors.length > 0 && (
+                  <div className="p-4 bg-red-50 text-red-700 rounded-md mb-4 text-sm">
+                    <p className="font-medium mb-1">Please correct your address:</p>
+                    <ul className="list-disc list-inside">
+                      {addressErrors.map((err, idx) => (
+                        <li key={idx}>
+                          {formatAddressFieldName(err.field)}: {err.message || err.code || "Invalid value"}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 <button
                   type="submit"
