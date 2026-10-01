@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "generate-gifs": "node --env-file=.env scripts/generate-product-gifs.mjs",
     "catalog:snapshot": "node scripts/export-catalog-snapshot.mjs",
@@ -38,6 +39,7 @@
     "eslint-config-next": "16.1.6",
     "playwright": "^1.61.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   }
 }

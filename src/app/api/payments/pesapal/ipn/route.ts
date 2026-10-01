@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { gql } from "graphql-tag";
 import { saleorAdmin } from "@/lib/saleor-server";
 import { getPesapalStatus } from "@/lib/pesapal";
-import { TRANSACTION_CREATE } from "@/graphql/transactions";
+import { TRANSACTION_CREATE, TRANSACTION_EVENT_REPORT } from "@/graphql/transactions";
 import { CHECKOUT_COMPLETE_MUTATION } from "@/graphql/checkout";
 
 // PesaPal IPN listener — called server-to-server by PesaPal after a payment.
@@ -25,10 +25,8 @@ const CHECKOUT_TRANSACTIONS_QUERY = gql`
       transactions {
         id
         pspReference
-        chargedAmount {
-          amount
-          currency
-        }
+        authorizedAmount { amount }
+        chargedAmount { amount currency }
       }
     }
   }
@@ -41,6 +39,7 @@ type CheckoutTransactionsResult = {
     transactions: Array<{
       id: string;
       pspReference: string;
+      authorizedAmount: { amount: number };
       chargedAmount: { amount: number; currency: string };
     }>;
   } | null;
@@ -49,6 +48,13 @@ type CheckoutTransactionsResult = {
 type TransactionCreateResult = {
   transactionCreate: {
     transaction: { id: string } | null;
+    errors: Array<{ field: string | null; message: string; code: string }>;
+  };
+};
+
+type TransactionEventReportResult = {
+  transactionEventReport: {
+    alreadyProcessed: boolean;
     errors: Array<{ field: string | null; message: string; code: string }>;
   };
 };
@@ -75,9 +81,27 @@ export async function completePesapalPayment(
 
   const { amount, currency } = checkout.totalPrice.gross;
 
-  // Skip if we already recorded a charged transaction for this PesaPal reference
-  const existing = checkout.transactions.find((t) => t.pspReference === orderTrackingId);
-  if (!existing) {
+  const existingTxn = checkout.transactions.find((t) => t.pspReference === orderTrackingId);
+
+  if (existingTxn) {
+    if (existingTxn.chargedAmount.amount > 0) {
+      // Already fully charged — fall through to checkoutComplete.
+    } else {
+      // PENDING transaction exists (created at initiate time) — upgrade it to CHARGED in place.
+      // transactionEventReport is idempotent (alreadyProcessed flag) so safe to replay.
+      const report = await saleorAdmin<TransactionEventReportResult>(TRANSACTION_EVENT_REPORT, {
+        id: existingTxn.id,
+        type: "CHARGE_SUCCESS",
+        amount,
+        pspReference: orderTrackingId,
+        message: `PesaPal payment confirmed (${orderTrackingId})`,
+      });
+      if (report.transactionEventReport.errors.length) {
+        return { error: report.transactionEventReport.errors[0].message };
+      }
+    }
+  } else {
+    // No existing transaction — create new CHARGED transaction (path before ticket 02 PENDING).
     const txn = await saleorAdmin<TransactionCreateResult>(TRANSACTION_CREATE, {
       id: checkoutId,
       transaction: {
@@ -91,7 +115,6 @@ export async function completePesapalPayment(
         pspReference: orderTrackingId,
       },
     });
-
     if (txn.transactionCreate.errors.length) {
       return { error: txn.transactionCreate.errors[0].message };
     }

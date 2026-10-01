@@ -18,7 +18,8 @@
 //   SRC_URL   (default http://localhost:8000/graphql/)
 //   SRC_EMAIL SRC_PASSWORD (default admin@example.com / admin)
 //   DST_URL   (default https://store-drwvfcof.eu.saleor.cloud/graphql/)
-//   DST_TOKEN (REQUIRED — Cloud staff token w/ MANAGE_PRODUCTS + MANAGE_PRODUCT_TYPES_AND_ATTRIBUTES)
+//   DST_TOKEN (static staff token) OR DST_EMAIL+DST_PASSWORD (preferred:
+//   logs in and auto-refreshes tokens during long runs)
 //   CHANNEL   (default default-channel)   [--limit N] [--only <slug>]
 
 import { execFileSync } from "node:child_process";
@@ -32,6 +33,8 @@ const CFG = {
   srcPassword: process.env.SRC_PASSWORD || "admin",
   dstUrl: process.env.DST_URL || "https://store-drwvfcof.eu.saleor.cloud/graphql/",
   dstToken: process.env.DST_TOKEN || "",
+  dstEmail: process.env.DST_EMAIL || "admin@example.com",
+  dstPassword: process.env.DST_PASSWORD || "",
   channel: process.env.CHANNEL || "default-channel",
 };
 
@@ -55,15 +58,42 @@ const slugify = (s) => (s || "").toString().toLowerCase().trim()
   .replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 // ---------- HTTP ----------
-let SRC_TOKEN = null;
-async function gqlSrc(query, variables = {}) {
+let SRC_TOKEN = null, SRC_REFRESH = null;
+// Mutable DST token: starts as DST_TOKEN override, or set by dstLogin().
+let DST_TOKEN_RT = CFG.dstToken || null, DST_REFRESH = null;
+const isExpired = (json) =>
+  (json.errors || []).some((e) =>
+    /expiredsignature/i.test(e.message || "") ||
+    /expiredsignature/i.test(JSON.stringify(e.extensions || {})));
+async function refreshAccessToken(url, refreshToken) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: `mutation($r:String!){tokenRefresh(refreshToken:$r){token refreshToken errors{message}}}`,
+      variables: { r: refreshToken },
+    }),
+  });
+  const json = await res.json();
+  return json.data?.tokenRefresh || null;
+}
+async function gqlSrc(query, variables = {}, retried = false) {
   const res = await fetch(CFG.srcUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...(SRC_TOKEN ? { Authorization: `Bearer ${SRC_TOKEN}` } : {}) },
     body: JSON.stringify({ query, variables }),
   });
   const json = await res.json();
-  if (json.errors) throw new Error("SRC GQL: " + JSON.stringify(json.errors));
+  if (json.errors) {
+    // Saleor access tokens live ~5 min; long runs must re-login and retry.
+    // (Deliberately re-login rather than tokenRefresh: simpler and proven.)
+    if (!retried && isExpired(json)) {
+      console.log("  ↻ SRC token expired, re-login...");
+      await srcLogin();
+      return gqlSrc(query, variables, true);
+    }
+    throw new Error("SRC GQL: " + JSON.stringify(json.errors));
+  }
   return json.data;
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -75,13 +105,13 @@ function paced() {
   _gate = p;
   return p;
 }
-async function gqlDst(query, variables = {}, attempt = 0) {
+async function gqlDst(query, variables = {}, attempt = 0, refreshed = false) {
   await paced();
   let res, json;
   try {
     res = await fetch(CFG.dstUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${CFG.dstToken}` },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${DST_TOKEN_RT}` },
       body: JSON.stringify({ query, variables }),
     });
   } catch (e) {
@@ -95,6 +125,12 @@ async function gqlDst(query, variables = {}, attempt = 0) {
   try { json = await res.json(); }
   catch (e) { if (attempt < 5) { await sleep(500 * 2 ** attempt); return gqlDst(query, variables, attempt + 1); } throw new Error(`DST non-JSON ${res.status}`); }
   if (json.errors) {
+    // Long runs outlive the ~5 min access token: re-login once, then retry.
+    if (!refreshed && isExpired(json)) {
+      console.log("  ↻ DST token expired, re-login...");
+      await dstLogin();
+      return gqlDst(query, variables, attempt, true);
+    }
     const rate = json.errors.some((e) => /rate|throttl|too many/i.test(e.message || ""));
     if (rate && attempt < 5) { await sleep(500 * 2 ** attempt); return gqlDst(query, variables, attempt + 1); }
     throw new Error("DST GQL: " + JSON.stringify(json.errors));
@@ -103,10 +139,27 @@ async function gqlDst(query, variables = {}, attempt = 0) {
   return json.data;
 }
 async function srcLogin() {
-  const d = await gqlSrc(`mutation($e:String!,$p:String!){tokenCreate(email:$e,password:$p){token errors{message}}}`,
+  const d = await gqlSrc(`mutation($e:String!,$p:String!){tokenCreate(email:$e,password:$p){token refreshToken errors{message}}}`,
     { e: CFG.srcEmail, p: CFG.srcPassword });
   if (!d.tokenCreate.token) throw new Error("SRC login failed: " + JSON.stringify(d.tokenCreate.errors));
   SRC_TOKEN = d.tokenCreate.token;
+  SRC_REFRESH = d.tokenCreate.refreshToken || null;
+}
+async function dstLogin() {
+  // Preferred: staff email+password so the long run can refresh tokens.
+  // Falls back to the static DST_TOKEN override (no refresh possible).
+  if (!CFG.dstPassword) {
+    if (!CFG.dstToken) throw new Error("Set DST_TOKEN or DST_EMAIL+DST_PASSWORD");
+    DST_TOKEN_RT = CFG.dstToken;
+    console.log("  DST: using static token (no auto-refresh)");
+    return;
+  }
+  const d = await gqlDst(`mutation($e:String!,$p:String!){tokenCreate(email:$e,password:$p){token refreshToken errors{message}}}`,
+    { e: CFG.dstEmail, p: CFG.dstPassword });
+  if (!d.tokenCreate?.token) throw new Error("DST login failed: " + JSON.stringify(d.tokenCreate?.errors));
+  DST_TOKEN_RT = d.tokenCreate.token;
+  DST_REFRESH = d.tokenCreate.refreshToken || null;
+  console.log("  DST: logged in with refresh support");
 }
 
 // ---------- args ----------
@@ -392,14 +445,21 @@ async function uploadMedia(productId, filePath, alt, attempt = 0) {
   let res;
   try {
     await paced();
-    res = await fetch(CFG.dstUrl, { method: "POST", headers: { Authorization: `Bearer ${CFG.dstToken}` }, body: form });
+    res = await fetch(CFG.dstUrl, { method: "POST", headers: { Authorization: `Bearer ${DST_TOKEN_RT}` }, body: form });
   } catch (e) {
     if (attempt < 5) { await sleep(500 * 2 ** attempt); return uploadMedia(productId, filePath, alt, attempt + 1); }
     throw e;
   }
   if ((res.status === 429 || res.status >= 500) && attempt < 5) { await sleep(500 * 2 ** attempt); return uploadMedia(productId, filePath, alt, attempt + 1); }
   const json = await res.json();
-  if (json.errors) throw new Error(JSON.stringify(json.errors));
+  if (json.errors) {
+    if (attempt < 5 && isExpired(json)) {
+      console.log("  ↻ DST token expired (upload), re-login...");
+      await dstLogin();
+      return uploadMedia(productId, filePath, alt, attempt + 1);
+    }
+    throw new Error(JSON.stringify(json.errors));
+  }
   const errs = json.data?.productMediaCreate?.errors;
   if (errs?.length) throw new Error(JSON.stringify(errs));
   return json.data?.productMediaCreate?.media?.id;
@@ -491,8 +551,9 @@ const VALID = ["purge", "setup", "categories", "products", "images", "variant-me
     console.error("Usage: node scripts/mirror-saleor-to-cloud.mjs <" + VALID.join("|") + "> [--limit N] [--only slug]");
     process.exit(1);
   }
-  if (!CFG.dstToken) throw new Error("DST_TOKEN env required (Cloud staff token)");
+  if (!CFG.dstToken && !CFG.dstPassword) throw new Error("Set DST_TOKEN or DST_EMAIL+DST_PASSWORD");
   await srcLogin();
+  await dstLogin();
   await loadDstContext();
   if (stage === "purge") return void (await stagePurge());
   if (["setup", "categories", "products", "images", "all"].includes(stage)) await stageSetup();

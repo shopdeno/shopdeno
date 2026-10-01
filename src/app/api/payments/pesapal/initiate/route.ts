@@ -2,6 +2,15 @@ import { NextResponse } from "next/server";
 import { gql } from "graphql-tag";
 import { saleorAdmin } from "@/lib/saleor-server";
 import { pesapalPost } from "@/lib/pesapal";
+import { getUsdToKesRate, convertUsdToKes } from "@/lib/fx";
+import { TRANSACTION_CREATE } from "@/graphql/transactions";
+
+type TransactionCreateResult = {
+  transactionCreate: {
+    transaction: { id: string } | null;
+    errors: Array<{ field: string | null; message: string; code: string }>;
+  };
+};
 
 const CHECKOUT_FOR_PAYMENT_QUERY = gql`
   query CheckoutForPayment($id: ID!) {
@@ -78,13 +87,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Checkout not found" }, { status: 404 });
     }
 
-    const { amount, currency } = checkout.totalPrice.gross;
+    const { amount: usdAmount } = checkout.totalPrice.gross; // currency is always USD (Saleor channel)
     const billing = checkout.billingAddress;
+
+    // Convert USD → KES: PesaPal account is KES-denominated (M-Pesa).
+    const fxRate = await getUsdToKesRate();
+    const kesAmount = convertUsdToKes(usdAmount, fxRate);
 
     const payload = {
       id: checkoutId,
-      currency,
-      amount,
+      currency: "KES",
+      amount: kesAmount,
       description: "Dennis Muraguri Art Prints — order payment",
       callback_url: `${siteUrl}/checkout/return?provider=pesapal`,
       ...(ipnId && { notification_id: ipnId }),
@@ -111,6 +124,26 @@ export async function POST(request: Request) {
         { error: "PesaPal did not return a redirect URL", raw: data },
         { status: 502 }
       );
+    }
+
+    // Create a PENDING (authorized) Saleor transaction so the reconciliation sweep can
+    // discover this payment if the customer pays on M-Pesa and never returns to the tab.
+    const txn = await saleorAdmin<TransactionCreateResult>(TRANSACTION_CREATE, {
+      id: checkoutId,
+      transaction: {
+        name: "PesaPal — M-Pesa / card payment",
+        pspReference: data.order_tracking_id,
+        availableActions: [],
+        amountAuthorized: { amount: usdAmount, currency: "USD" },
+      },
+      transactionEvent: {
+        message: `PesaPal order submitted (trackingId: ${data.order_tracking_id})`,
+        pspReference: data.order_tracking_id,
+      },
+    });
+    if (txn.transactionCreate.errors.length) {
+      // Non-fatal: log but still return redirect. Worst case the sweep has nothing to find.
+      console.error("PesaPal initiate: failed to create pending transaction", txn.transactionCreate.errors);
     }
 
     return NextResponse.json({
