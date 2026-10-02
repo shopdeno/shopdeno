@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { productDisplayName } from "@/lib/site-config";
 import { getBlurDataURL, sizedImageUrl } from "@/lib/imageUtils";
+import { PRODUCT_GIF_IDS } from "@/lib/product-gifs-manifest";
 
 export interface ProductCardProduct {
   id: string;
@@ -56,7 +57,12 @@ export function ProductCard({
   // Determine if we have a generated GIF for this product (multiple images)
   const hasMultipleImages =
     (images ?? []).length > 1;
-  const gifSrc = hasMultipleImages ? `/product-gifs/${product.id}.gif` : null;
+  // Only reference a GIF that was actually generated (see product-gifs-manifest),
+  // otherwise the always-mounted hover <Image> 404s for GIF-less products.
+  const gifSrc =
+    hasMultipleImages && PRODUCT_GIF_IDS.has(product.id)
+      ? `/product-gifs/${product.id}.gif`
+      : null;
 
   const [showHover, setShowHover] = useState(false);
 
