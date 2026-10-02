@@ -102,7 +102,7 @@ interface CheckoutContextType {
   updateAddress: (address: Address, type: "shipping" | "billing", opts?: { skipStepChange?: boolean }) => Promise<Checkout | null>;
   updateBillingAddress: (address: Address) => Promise<Checkout | null>;
   updateEmail: (email: string) => Promise<void>;
-  updateDeliveryMethod: (methodId: string) => Promise<void>;
+  updateDeliveryMethod: (methodId: string) => Promise<boolean>;
   completeCheckout: () => Promise<{ orderId?: string; redirectUrl?: string; error?: string }>;
 }
 
@@ -267,9 +267,10 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
   );
 
   const updateDeliveryMethod = useCallback(
-    async (methodId: string) => {
-      if (!checkout) return;
+    async (methodId: string): Promise<boolean> => {
+      if (!checkout) return false;
       setIsLoading(true);
+      let ok = false;
 
       try {
         // Re-fetch after the mutation: checkoutDeliveryMethodUpdate returns a
@@ -292,6 +293,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
             setCheckout((prev) => prev ? { ...prev, ...result.data.checkoutDeliveryMethodUpdate.checkout } : prev);
           }
           setStep("payment");
+          ok = true;
         } else if (result.data?.checkoutDeliveryMethodUpdate?.errors?.length) {
           console.error(
             "Delivery method error:",
@@ -305,6 +307,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
       } finally {
         setIsLoading(false);
       }
+      return ok;
     },
     [checkout, client, fetchCheckout]
   );

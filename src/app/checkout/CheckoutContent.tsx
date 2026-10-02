@@ -187,8 +187,18 @@ export function CheckoutContent({ cart: cartProp, countries = [] }: { cart?: Car
       setOrderError("Could not process your information. Please check all fields and try again.");
       return;
     }
-    // Use Saleor Cloud "Default" warehouse for click-and-collect.
-    await updateDeliveryMethod(siteConfig.studio.warehouseId);
+    // Prefer a collection point the backend actually offers for this checkout;
+    // fall back to the configured studio warehouse. Surface a visible error when
+    // the delivery update is rejected (e.g. click-and-collect not enabled on the
+    // backend) instead of silently staying on this step.
+    const collectionPointId =
+      checkout?.availableCollectionPoints?.[0]?.id ?? siteConfig.studio.warehouseId;
+    const deliveryOk = await updateDeliveryMethod(collectionPointId);
+    if (!deliveryOk) {
+      setOrderError(
+        "Studio collection isn't available right now. Please choose shipping instead, or contact us to arrange pickup."
+      );
+    }
   };
 
   const [orderError, setOrderError] = useState<string | null>(null);
