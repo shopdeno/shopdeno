@@ -27,9 +27,11 @@ export const siteConfig = {
     mapsUrl:
       "https://www.google.com/maps/place/Kuona+Artists+collective,+Centre+for+the+Visual+Arts/@-1.284466,36.7888362,885m/data=!3m2!1e3!4b1!4m6!3m5!1s0x182f10ae9666a5f5:0x110f113782108cfb!8m2!3d-1.284466!4d36.7888362!16s%2Fg%2F1tdt3hvk",
     pickupNote: "Free collection/pickup available at the studio in Nairobi.",
-    // Saleor Cloud "Default" warehouse — verified via availableCollectionPoints on live checkout.
+    // Prod "Default Warehouse" (Warehouse:c2bbb469-3b99-4ecd-a3e8-5a6d017d5508) —
+    // verified via availableCollectionPoints on a live checkout. Used only as a
+    // fallback; the collect flow prefers checkout.availableCollectionPoints[0].
     // Local dev override: set NEXT_PUBLIC_STUDIO_WAREHOUSE_ID in .env.local.
-    warehouseId: process.env.NEXT_PUBLIC_STUDIO_WAREHOUSE_ID || "V2FyZWhvdXNlOjcwODA0YzdmLTVlNzAtNDNmNy1hMDM5LWIwMGU5Y2QxNTM4Nw==",
+    warehouseId: process.env.NEXT_PUBLIC_STUDIO_WAREHOUSE_ID || "V2FyZWhvdXNlOmMyYmJiNDY5LTNiOTktNGVjZC1hM2U4LTVhNmQwMTdkNTUwOA==",
   },
   social: {
     facebook: "https://www.facebook.com/muraguridenis/",
