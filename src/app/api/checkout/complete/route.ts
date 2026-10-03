@@ -3,29 +3,66 @@ import { gql } from "graphql-tag";
 import { saleorAdmin } from "@/lib/saleor-server";
 import { TRANSACTION_CREATE } from "@/graphql/transactions";
 import { CHECKOUT_COMPLETE_MUTATION } from "@/graphql/checkout";
+import { sendOrderConfirmationEmail, type OrderEmailLine } from "@/lib/order-email";
 
 // Studio pickup / offline completion. Records an AUTHORIZED transaction covering
 // the full total (money collected on collection at the studio), which flips the
 // checkout's authorizeStatus to FULL, then completes it into an order.
 
-const CHECKOUT_TOTAL_QUERY = gql`
-  query CheckoutTotal($checkoutId: ID!) {
+// Pulls everything needed BOTH to authorize the transaction and to build the
+// confirmation email, in one round-trip, while the checkout still exists.
+const CHECKOUT_SUMMARY_QUERY = gql`
+  query CheckoutSummary($checkoutId: ID!) {
     checkout(id: $checkoutId) {
       id
+      email
+      isShippingRequired
       totalPrice {
         gross {
           amount
           currency
         }
       }
+      lines {
+        quantity
+        unitPrice {
+          gross {
+            amount
+            currency
+          }
+        }
+        variant {
+          name
+          product {
+            name
+          }
+        }
+      }
+      deliveryMethod {
+        __typename
+        ... on ShippingMethod {
+          name
+        }
+        ... on Warehouse {
+          name
+        }
+      }
     }
   }
 `;
 
-type CheckoutTotalResult = {
+type CheckoutSummaryResult = {
   checkout: {
     id: string;
+    email: string | null;
+    isShippingRequired: boolean;
     totalPrice: { gross: { amount: number; currency: string } };
+    lines: Array<{
+      quantity: number;
+      unitPrice: { gross: { amount: number; currency: string } };
+      variant: { name: string | null; product: { name: string } } | null;
+    }>;
+    deliveryMethod: { __typename: string; name?: string } | null;
   } | null;
 };
 
@@ -58,8 +95,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    // 1. Read the authoritative total server-side (never trust client amounts).
-    const { checkout } = await saleorAdmin<CheckoutTotalResult>(CHECKOUT_TOTAL_QUERY, {
+    // 1. Read the authoritative total + order details server-side (never trust
+    //    client amounts). Captured now because the checkout is consumed on complete.
+    const { checkout } = await saleorAdmin<CheckoutSummaryResult>(CHECKOUT_SUMMARY_QUERY, {
       checkoutId,
     });
     if (!checkout) {
@@ -103,6 +141,10 @@ export async function POST(request: Request) {
       );
     }
 
+    // 4. Send the confirmation email synchronously via Resend (NOT via the Saleor
+    //    worker). Must never fail the order — the order already exists.
+    await sendConfirmation(checkout, order.number);
+
     return NextResponse.json({ orderId: order.id, orderNumber: order.number });
   } catch (err) {
     console.error("Pickup completion failed:", err);
@@ -110,5 +152,37 @@ export async function POST(request: Request) {
       { error: err instanceof Error ? err.message : "Completion failed" },
       { status: 500 }
     );
+  }
+}
+
+// Fire-and-log the confirmation email. Swallows all failures so a mail problem
+// can never roll back or 500 a successfully created order.
+async function sendConfirmation(
+  checkout: NonNullable<CheckoutSummaryResult["checkout"]>,
+  orderNumber: string
+): Promise<void> {
+  if (!checkout.email) {
+    console.warn(`Order ${orderNumber}: no email on checkout, skipping confirmation.`);
+    return;
+  }
+  const lines: OrderEmailLine[] = checkout.lines.map((l) => ({
+    name: l.variant?.product.name ?? l.variant?.name ?? "Art print",
+    quantity: l.quantity,
+    amount: l.unitPrice.gross.amount,
+    currency: l.unitPrice.gross.currency,
+  }));
+  const isPickup =
+    checkout.deliveryMethod?.__typename === "Warehouse" || !checkout.isShippingRequired;
+
+  const result = await sendOrderConfirmationEmail({
+    to: checkout.email,
+    orderNumber,
+    lines,
+    total: checkout.totalPrice.gross,
+    delivery: isPickup ? "pickup" : "ship",
+    deliveryName: checkout.deliveryMethod?.name ?? null,
+  });
+  if (!result.ok) {
+    console.error(`Order ${orderNumber}: confirmation email failed — ${result.error}`);
   }
 }
