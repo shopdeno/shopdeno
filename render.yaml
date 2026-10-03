@@ -16,6 +16,8 @@ services:
     envVars:
       - key: SECRET_KEY
         sync: false
+      - key: DEBUG
+        value: "false"
       - key: DATABASE_URL
         sync: false
       - key: REDIS_URL
@@ -63,6 +65,8 @@ services:
         value: worker
       - key: SECRET_KEY
         sync: false
+      - key: DEBUG
+        value: "false"
       - key: DATABASE_URL
         sync: false
       - key: REDIS_URL
