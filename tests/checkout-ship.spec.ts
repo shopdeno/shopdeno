@@ -50,8 +50,9 @@ test('ship-to-address checkout offers a delivery method', async ({ page }) => {
   await text.nth(6).fill('00100');
   await page.getByRole('button', { name: /continue to shipping/i }).click();
 
-  // 4. On the shipping step a delivery method must be available to purchase.
+  // 4. On the shipping step at least one delivery method must be available.
   await expect(
-    page.getByRole('radio'),
+    page.getByRole('radio').first(),
   ).toBeVisible({ timeout: 30_000 });
+  expect(await page.getByRole('radio').count()).toBeGreaterThan(0);
 });
