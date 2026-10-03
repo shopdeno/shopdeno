@@ -67,6 +67,10 @@ services:
         sync: false
       - key: DEBUG
         value: "false"
+      # Required by saleor/settings.py when DEBUG=False (raises ImproperlyConfigured
+      # at import otherwise → worker crash-loops). Mirrors the api service above.
+      - key: ALLOWED_CLIENT_HOSTS
+        value: shop.dennis-muraguri.co.ke,my-catalyst-next.vercel.app
       - key: DATABASE_URL
         sync: false
       - key: REDIS_URL
