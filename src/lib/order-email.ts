@@ -23,6 +23,11 @@ export type OrderEmailParams = {
   deliveryName?: string | null;
 };
 
+// Resend sends only from a verified domain. The verified domain is the root
+// `dennis-muraguri.co.ke` (NOT the `shop.` subdomain), so the From must use it.
+// Override via ORDER_EMAIL_FROM if a different verified sender is set up later.
+const FROM_ADDRESS = process.env.ORDER_EMAIL_FROM || "sales@dennis-muraguri.co.ke";
+
 const money = (amount: number, currency: string) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
 
@@ -87,8 +92,9 @@ export async function sendOrderConfirmationEmail(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: `${siteConfig.name} <${siteConfig.contact.email}>`,
+        from: `${siteConfig.name} <${FROM_ADDRESS}>`,
         to: [p.to],
+        reply_to: siteConfig.contact.email,
         subject: `Order #${p.orderNumber} confirmed — ${siteConfig.name}`,
         html: buildHtml(p),
       }),
