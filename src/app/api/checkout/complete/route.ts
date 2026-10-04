@@ -4,6 +4,7 @@ import { saleorAdmin } from "@/lib/saleor-server";
 import { TRANSACTION_CREATE } from "@/graphql/transactions";
 import { CHECKOUT_COMPLETE_MUTATION } from "@/graphql/checkout";
 import { sendOrderConfirmationEmail, type OrderEmailLine } from "@/lib/order-email";
+import { sizedImageUrl } from "@/lib/imageUtils";
 
 // Studio pickup / offline completion. Records an AUTHORIZED transaction covering
 // the full total (money collected on collection at the studio), which flips the
@@ -39,8 +40,14 @@ const CHECKOUT_SUMMARY_QUERY = gql`
         }
         variant {
           name
+          media {
+            url
+          }
           product {
             name
+            thumbnail {
+              url
+            }
           }
         }
       }
@@ -68,7 +75,11 @@ type CheckoutSummaryResult = {
     lines: Array<{
       quantity: number;
       unitPrice: { gross: { amount: number; currency: string } };
-      variant: { name: string | null; product: { name: string } } | null;
+      variant: {
+        name: string | null;
+        media: Array<{ url: string }>;
+        product: { name: string; thumbnail: { url: string } | null };
+      } | null;
     }>;
     deliveryMethod: { __typename: string; name?: string } | null;
   } | null;
@@ -173,12 +184,19 @@ async function sendConfirmation(
     console.warn(`Order ${orderNumber}: no email on checkout, skipping confirmation.`);
     return;
   }
-  const lines: OrderEmailLine[] = checkout.lines.map((l) => ({
-    name: l.variant?.product.name ?? l.variant?.name ?? "Art print",
-    quantity: l.quantity,
-    amount: l.unitPrice.gross.amount,
-    currency: l.unitPrice.gross.currency,
-  }));
+  const lines: OrderEmailLine[] = checkout.lines.map((l) => {
+    // Prefer the purchased variant's image; once the catalog's per-color variant→image
+    // mapping is corrected, this automatically shows the right colour. Falls back to the
+    // product thumbnail. Sized down to 256px for email.
+    const rawImage = l.variant?.media[0]?.url ?? l.variant?.product.thumbnail?.url ?? null;
+    return {
+      name: l.variant?.product.name ?? l.variant?.name ?? "Art print",
+      quantity: l.quantity,
+      amount: l.unitPrice.gross.amount,
+      currency: l.unitPrice.gross.currency,
+      imageUrl: rawImage ? sizedImageUrl(rawImage, 256) : null,
+    };
+  });
   const isPickup =
     checkout.deliveryMethod?.__typename === "Warehouse" || !checkout.isShippingRequired;
 

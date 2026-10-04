@@ -11,6 +11,8 @@ export type OrderEmailLine = {
   quantity: number;
   amount: number;
   currency: string;
+  /** Absolute image URL for the purchased variant (or product fallback). */
+  imageUrl?: string | null;
 };
 
 export type OrderEmailParams = {
@@ -45,8 +47,17 @@ export function renderOrderEmailHtml(p: OrderEmailParams): string {
     .map(
       (l) =>
         `<tr>
-          <td style="padding:8px 0;border-bottom:1px solid #eee">${l.quantity}× ${escapeHtml(l.name)}</td>
-          <td style="padding:8px 0;border-bottom:1px solid #eee;text-align:right">${money(l.amount * l.quantity, l.currency)}</td>
+          <td style="padding:8px 0;border-bottom:1px solid #eee">
+            <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+              ${
+                l.imageUrl
+                  ? `<td style="padding-right:12px"><img src="${l.imageUrl}" width="52" height="52" alt="${escapeHtml(l.name)}" style="display:block;width:52px;height:52px;object-fit:cover;border-radius:4px;border:1px solid #eee"></td>`
+                  : ""
+              }
+              <td style="vertical-align:middle">${l.quantity}× ${escapeHtml(l.name)}</td>
+            </tr></table>
+          </td>
+          <td style="padding:8px 0;border-bottom:1px solid #eee;text-align:right;vertical-align:middle">${money(l.amount * l.quantity, l.currency)}</td>
         </tr>`
     )
     .join("");
