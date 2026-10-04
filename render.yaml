@@ -8,6 +8,10 @@ services:
     runtime: docker
     repo: https://github.com/shopdeno/shopdeno
     branch: main
+    # Storefront code lives in the same repo/branch; without this, every storefront
+    # merge redeploys this live API (~1-2 min downtime → browser CORS/ERR_FAILED).
+    # Backend changes are rare — deploy those manually.
+    autoDeploy: false
     region: frankfurt
     plan: free
     dockerfilePath: ./hosting/Dockerfile
@@ -55,6 +59,8 @@ services:
     runtime: docker
     repo: https://github.com/shopdeno/shopdeno
     branch: main
+    # See api service above — don't redeploy the worker on storefront merges.
+    autoDeploy: false
     region: frankfurt
     plan: free
     dockerfilePath: ./hosting/Dockerfile
