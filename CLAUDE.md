@@ -44,7 +44,7 @@ No unit/integration test runner. Env required: copy `.env.example` → `.env`, s
 
 **Routes.** Home, `/products` (PLP), `/search`, `/collections` + `/collections/[slug]`, `/categories/[slug]`, `/saccos`, `/products/[slug]`, `/account` + `/account/login|register|addresses|addresses/new|orders/[id]`, `/checkout`. Static content pages: `/faq`, `/contact`, `/shipping-and-delivery`, `/refund-returns`, `/privacy-policy`, `/cookies-policy`, `/term-and-conditions`.
 
-**API Routes** (`src/app/api/`): `checkout/complete` (studio pickup — AUTHORIZED transaction + `checkoutComplete`), `payments/pesapal/` (stubbed), `payments/paypal/` (stubbed).
+**API Routes** (`src/app/api/`): `checkout/complete` (studio pickup — AUTHORIZED transaction + `checkoutComplete`), `payments/pesapal/` (**LIVE** — `initiate`/`status`/`ipn`/`register-ipn` against `pay.pesapal.com/v3`, USD→KES via `lib/fx.ts`, reconcile cron), `payments/paypal/` (stubbed).
 
 ## Migration (WooCommerce → Saleor)
 
@@ -55,7 +55,7 @@ No unit/integration test runner. Env required: copy `.env.example` → `.env`, s
 - **`sortBy` must be a Saleor `ProductOrder` object**, not a string. Use `toProductOrder()`. A bare `"DATE"` errors and silently returns no products.
 - **`category(...)` takes no `channel` argument** — passing one makes it 404. `CATEGORY_DETAIL_QUERY` is channel-free.
 - **`ProductInput` (update) rejects `productType`** — only `ProductCreateInput` accepts it. Strip it on update (see migration script).
-- **Checkout completion flow.** `src/app/api/checkout/complete/route.ts` uses `saleorAdmin` to run `transactionCreate` (HANDLE_PAYMENTS, records AUTHORIZED for full total) → `checkoutComplete`. Studio pickup is live. PesaPal + PayPal (`/api/payments/*`) are stubbed pending client sandbox creds.
+- **Checkout completion flow.** `src/app/api/checkout/complete/route.ts` uses `saleorAdmin` to run `transactionCreate` (HANDLE_PAYMENTS, records AUTHORIZED for full total) → `checkoutComplete`. Studio pickup is live. **PesaPal is LIVE** (`pay.pesapal.com/v3`, live consumer key/secret in Vercel prod): `initiate` converts USD→KES + creates a PENDING txn, `ipn`/`status` confirm via `getPesapalStatus` → `completePesapalPayment` upgrades the txn to CHARGED, runs `checkoutComplete`, and sends the Resend confirmation via `sendCheckoutConfirmation` (shared with the pickup route). A daily reconcile cron sweeps paid-but-pending checkouts. IPN id `cbe10745…` registered for `shop.dennis-muraguri.co.ke`. PayPal (`/api/payments/paypal/*`) is still stubbed. NOTE: real-money end-to-end M-Pesa test still pending (deferred by client).
 - **Checkout needs BOTH billing + shipping, and `countryArea`.** `checkoutComplete` fails `BILLING_ADDRESS_NOT_SET` unless billing is set — `UPDATE_CHECKOUT_ADDRESS_MUTATION` sets shipping+billing in one call. `AddressInput.country` is a **CountryCode string** (not the UI's `{code,country}` object) — `updateAddress()` maps it. US addresses need `countryArea` (State), so the checkout form collects it.
 - **Delivery method, not shipping method.** Use `checkoutDeliveryMethodUpdate(id, deliveryMethodId)` — one field takes a ShippingMethod **or** a Warehouse (click-and-collect) id. Collection points come from `checkout.availableCollectionPoints`. The old `checkoutShippingMethodUpdate` is gone.
 - **`images.unoptimized: true` is permanent**, not dev-only. Vercel Hobby plan's 1,000 image optimization transformations/month quota was exhausted; Saleor Cloud already serves images via CloudFront CDN so no optimizer is needed. Do not remove this.
@@ -81,5 +81,5 @@ No unit/integration test runner. Env required: copy `.env.example` → `.env`, s
 
 ## Status & next
 
-- **Done:** catalog migration (local), storefront hardening (branding, search, PLP, category pages, account order-detail + add-address, auth-token fix), studio pickup (`/api/checkout/complete` live), hover GIF animations (53 GIFs in production).
-- **Next (Phase 3):** payments — PesaPal (primary, KE) + PayPal (intl) — requires client sandbox credentials. Then Phase 4 (SEO/redirects) and Phase 5 (Saleor Cloud + Vercel deploy, domain cutover). Handoff: `PHASE-3-PAYMENTS-HANDOFF.md`.
+- **Done:** catalog migration (local), storefront hardening (branding, search, PLP, category pages, account order-detail + add-address, auth-token fix), studio pickup (`/api/checkout/complete` live), hover GIF animations (53 GIFs in production), **PesaPal payments LIVE** (live creds + prod env verified; IPN registered; reconcile cron green; confirmation email wired — real-money M-Pesa test deferred by client).
+- **Next:** run the deferred ~$1 live M-Pesa test (needs `MANAGE_PRODUCTS` Saleor creds to make a temp product — see repo-root `PESAPAL-GOLIVE-TODO.md`). PayPal (intl) still stubbed pending creds. Then Phase 4 (SEO/redirects) and Phase 5 (domain cutover). Handoff: `PHASE-3-PAYMENTS-HANDOFF.md`.
