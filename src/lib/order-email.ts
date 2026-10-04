@@ -1,4 +1,5 @@
 import { siteConfig } from "@/lib/site-config";
+import { sizedImageUrl } from "@/lib/imageUtils";
 
 // Order-confirmation email sent synchronously from the checkout-completion route
 // via the Resend HTTP API. This deliberately does NOT depend on the Saleor Celery
@@ -139,5 +140,70 @@ export async function sendOrderConfirmationEmail(
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "send failed" };
+  }
+}
+
+// Minimal checkout shape needed to build a confirmation email. Both the studio-pickup
+// route and the PesaPal completion path query these fields (before checkoutComplete
+// consumes the checkout) and hand the result here.
+export type CheckoutConfirmationData = {
+  email: string | null;
+  isShippingRequired: boolean;
+  billingAddress: { firstName: string | null } | null;
+  shippingAddress: { firstName: string | null } | null;
+  totalPrice: { gross: { amount: number; currency: string } };
+  lines: Array<{
+    quantity: number;
+    unitPrice: { gross: { amount: number; currency: string } };
+    variant: {
+      name: string | null;
+      media: Array<{ url: string }>;
+      product: { name: string; thumbnail: { url: string } | null };
+    } | null;
+  }>;
+  deliveryMethod: { __typename: string; name?: string } | null;
+};
+
+/**
+ * Builds and sends the order confirmation from a Saleor checkout summary. Shared by
+ * the studio-pickup completion route and the PesaPal completion path so both order
+ * types get an identical email. Never throws — logs and swallows failures so a mail
+ * problem can never roll back or 500 a successfully created order.
+ */
+export async function sendCheckoutConfirmation(
+  checkout: CheckoutConfirmationData,
+  orderNumber: string
+): Promise<void> {
+  if (!checkout.email) {
+    console.warn(`Order ${orderNumber}: no email on checkout, skipping confirmation.`);
+    return;
+  }
+  const lines: OrderEmailLine[] = checkout.lines.map((l) => {
+    // Prefer the purchased variant's image; falls back to the product thumbnail.
+    // Sized down to 256px for email.
+    const rawImage = l.variant?.media[0]?.url ?? l.variant?.product.thumbnail?.url ?? null;
+    return {
+      name: l.variant?.product.name ?? l.variant?.name ?? "Art print",
+      quantity: l.quantity,
+      amount: l.unitPrice.gross.amount,
+      currency: l.unitPrice.gross.currency,
+      imageUrl: rawImage ? sizedImageUrl(rawImage, 256) : null,
+    };
+  });
+  const isPickup =
+    checkout.deliveryMethod?.__typename === "Warehouse" || !checkout.isShippingRequired;
+
+  const result = await sendOrderConfirmationEmail({
+    to: checkout.email,
+    customerName:
+      checkout.billingAddress?.firstName || checkout.shippingAddress?.firstName || null,
+    orderNumber,
+    lines,
+    total: checkout.totalPrice.gross,
+    delivery: isPickup ? "pickup" : "ship",
+    deliveryName: checkout.deliveryMethod?.name ?? null,
+  });
+  if (!result.ok) {
+    console.error(`Order ${orderNumber}: confirmation email failed — ${result.error}`);
   }
 }

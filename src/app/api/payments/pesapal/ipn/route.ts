@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import { gql } from "graphql-tag";
 import { saleorAdmin } from "@/lib/saleor-server";
 import { getPesapalStatus } from "@/lib/pesapal";
 import { TRANSACTION_CREATE, TRANSACTION_EVENT_REPORT } from "@/graphql/transactions";
 import { CHECKOUT_COMPLETE_MUTATION } from "@/graphql/checkout";
+import { sendCheckoutConfirmation, type CheckoutConfirmationData } from "@/lib/order-email";
 
 // PesaPal IPN listener — called server-to-server by PesaPal after a payment.
 // Must return "OK" (plain text) for PesaPal to mark the notification as acknowledged.
@@ -12,10 +12,17 @@ import { CHECKOUT_COMPLETE_MUTATION } from "@/graphql/checkout";
 // PesaPal v3 sends GET with: OrderTrackingId, OrderMerchantReference, OrderNotificationType.
 // OrderMerchantReference = the checkoutId we passed as `id` in SubmitOrderRequest.
 
+// Pulls transactions (to upgrade the pending txn) AND everything needed to build the
+// confirmation email, in one round-trip, while the checkout still exists (checkoutComplete
+// consumes it). Email fields mirror CHECKOUT_SUMMARY_QUERY in /api/checkout/complete.
 const CHECKOUT_TRANSACTIONS_QUERY = gql`
   query CheckoutTransactions($id: ID!) {
     checkout(id: $id) {
       id
+      email
+      isShippingRequired
+      billingAddress { firstName }
+      shippingAddress { firstName }
       totalPrice {
         gross {
           amount
@@ -28,12 +35,26 @@ const CHECKOUT_TRANSACTIONS_QUERY = gql`
         authorizedAmount { amount }
         chargedAmount { amount currency }
       }
+      lines {
+        quantity
+        unitPrice { gross { amount currency } }
+        variant {
+          name
+          media { url }
+          product { name thumbnail { url } }
+        }
+      }
+      deliveryMethod {
+        __typename
+        ... on ShippingMethod { name }
+        ... on Warehouse { name }
+      }
     }
   }
 `;
 
 type CheckoutTransactionsResult = {
-  checkout: {
+  checkout: ({
     id: string;
     totalPrice: { gross: { amount: number; currency: string } };
     transactions: Array<{
@@ -42,7 +63,7 @@ type CheckoutTransactionsResult = {
       authorizedAmount: { amount: number };
       chargedAmount: { amount: number; currency: string };
     }>;
-  } | null;
+  } & CheckoutConfirmationData) | null;
 };
 
 type TransactionCreateResult = {
@@ -131,6 +152,11 @@ export async function completePesapalPayment(
     return { error: errors[0].message };
   }
   if (!order) return { error: "Order not created" };
+
+  // Send the Resend confirmation synchronously. Only reached when checkoutComplete
+  // yields a fresh order, so IPN / return-status / reconcile races send exactly one
+  // email. `checkout` was captured above, before completion consumed it. Never throws.
+  await sendCheckoutConfirmation(checkout, order.number);
 
   return { orderId: order.id, orderNumber: order.number };
 }

@@ -3,8 +3,7 @@ import { gql } from "graphql-tag";
 import { saleorAdmin } from "@/lib/saleor-server";
 import { TRANSACTION_CREATE } from "@/graphql/transactions";
 import { CHECKOUT_COMPLETE_MUTATION } from "@/graphql/checkout";
-import { sendOrderConfirmationEmail, type OrderEmailLine } from "@/lib/order-email";
-import { sizedImageUrl } from "@/lib/imageUtils";
+import { sendCheckoutConfirmation } from "@/lib/order-email";
 
 // Studio pickup / offline completion. Records an AUTHORIZED transaction covering
 // the full total (money collected on collection at the studio), which flips the
@@ -162,7 +161,7 @@ export async function POST(request: Request) {
 
     // 4. Send the confirmation email synchronously via Resend (NOT via the Saleor
     //    worker). Must never fail the order — the order already exists.
-    await sendConfirmation(checkout, order.number);
+    await sendCheckoutConfirmation(checkout, order.number);
 
     return NextResponse.json({ orderId: order.id, orderNumber: order.number });
   } catch (err) {
@@ -171,46 +170,5 @@ export async function POST(request: Request) {
       { error: err instanceof Error ? err.message : "Completion failed" },
       { status: 500 }
     );
-  }
-}
-
-// Fire-and-log the confirmation email. Swallows all failures so a mail problem
-// can never roll back or 500 a successfully created order.
-async function sendConfirmation(
-  checkout: NonNullable<CheckoutSummaryResult["checkout"]>,
-  orderNumber: string
-): Promise<void> {
-  if (!checkout.email) {
-    console.warn(`Order ${orderNumber}: no email on checkout, skipping confirmation.`);
-    return;
-  }
-  const lines: OrderEmailLine[] = checkout.lines.map((l) => {
-    // Prefer the purchased variant's image; once the catalog's per-color variant→image
-    // mapping is corrected, this automatically shows the right colour. Falls back to the
-    // product thumbnail. Sized down to 256px for email.
-    const rawImage = l.variant?.media[0]?.url ?? l.variant?.product.thumbnail?.url ?? null;
-    return {
-      name: l.variant?.product.name ?? l.variant?.name ?? "Art print",
-      quantity: l.quantity,
-      amount: l.unitPrice.gross.amount,
-      currency: l.unitPrice.gross.currency,
-      imageUrl: rawImage ? sizedImageUrl(rawImage, 256) : null,
-    };
-  });
-  const isPickup =
-    checkout.deliveryMethod?.__typename === "Warehouse" || !checkout.isShippingRequired;
-
-  const result = await sendOrderConfirmationEmail({
-    to: checkout.email,
-    customerName:
-      checkout.billingAddress?.firstName || checkout.shippingAddress?.firstName || null,
-    orderNumber,
-    lines,
-    total: checkout.totalPrice.gross,
-    delivery: isPickup ? "pickup" : "ship",
-    deliveryName: checkout.deliveryMethod?.name ?? null,
-  });
-  if (!result.ok) {
-    console.error(`Order ${orderNumber}: confirmation email failed — ${result.error}`);
   }
 }
