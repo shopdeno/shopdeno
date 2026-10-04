@@ -17,6 +17,12 @@ const CHECKOUT_SUMMARY_QUERY = gql`
       id
       email
       isShippingRequired
+      billingAddress {
+        firstName
+      }
+      shippingAddress {
+        firstName
+      }
       totalPrice {
         gross {
           amount
@@ -56,6 +62,8 @@ type CheckoutSummaryResult = {
     id: string;
     email: string | null;
     isShippingRequired: boolean;
+    billingAddress: { firstName: string | null } | null;
+    shippingAddress: { firstName: string | null } | null;
     totalPrice: { gross: { amount: number; currency: string } };
     lines: Array<{
       quantity: number;
@@ -176,6 +184,8 @@ async function sendConfirmation(
 
   const result = await sendOrderConfirmationEmail({
     to: checkout.email,
+    customerName:
+      checkout.billingAddress?.firstName || checkout.shippingAddress?.firstName || null,
     orderNumber,
     lines,
     total: checkout.totalPrice.gross,
