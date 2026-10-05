@@ -163,6 +163,54 @@ export default async function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="msapplication-TileImage" content="/favicon-192x192.png" />
         <meta name="msapplication-TileColor" content="#4f46e5" />
+        {/* Site-wide structured data: Organization + WebSite (per-page Product
+            schema lives in ProductDetailClient). Static JSON — no client JS. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": `${SITE_URL}/#organization`,
+                  name: "Dennis Muraguri Art Prints",
+                  url: SITE_URL,
+                  logo: `${SITE_URL}/favicon-512x512.png`,
+                  contactPoint: {
+                    "@type": "ContactPoint",
+                    telephone: siteConfig.contact.phone,
+                    email: siteConfig.contact.email,
+                    contactType: "sales",
+                  },
+                  address: {
+                    "@type": "PostalAddress",
+                    streetAddress: siteConfig.studio.address,
+                    addressLocality: "Nairobi",
+                    addressCountry: "KE",
+                  },
+                  sameAs: Object.values(siteConfig.social),
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": `${SITE_URL}/#website`,
+                  url: SITE_URL,
+                  name: SITE_NAME,
+                  description: SITE_DESCRIPTION,
+                  publisher: { "@id": `${SITE_URL}/#organization` },
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: {
+                      "@type": "EntryPoint",
+                      urlTemplate: `${SITE_URL}/search?q={search_term_string}`,
+                    },
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <Providers>
