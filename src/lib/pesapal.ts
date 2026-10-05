@@ -71,3 +71,28 @@ export async function getPesapalStatus(orderTrackingId: string): Promise<Pesapal
     `/api/Transactions/GetTransactionStatus?orderTrackingId=${encodeURIComponent(orderTrackingId)}`
   );
 }
+
+export type PesapalRefundResult = {
+  status: string; // "200" = request received (NOT yet effected — needs merchant/finance go-ahead)
+  message: string;
+};
+
+/**
+ * Files a refund request with PesaPal (full amount only for mobile money, one
+ * refund per payment, COMPLETED payments only — enforced by the caller).
+ * A "200" response means PesaPal RECEIVED the request; the money moves only
+ * after merchant/finance approval. Never throws — callers decide.
+ */
+export async function requestPesapalRefund(args: {
+  confirmationCode: string;
+  amount: number;
+  username: string;
+  remarks: string;
+}): Promise<PesapalRefundResult> {
+  return pesapalPost<PesapalRefundResult>("/api/Transactions/RefundRequest", {
+    confirmation_code: args.confirmationCode,
+    amount: args.amount,
+    username: args.username,
+    remarks: args.remarks,
+  });
+}
