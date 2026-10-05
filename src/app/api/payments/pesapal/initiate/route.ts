@@ -142,13 +142,26 @@ export async function POST(request: Request) {
       },
     });
     if (txn.transactionCreate.errors.length) {
-      // Non-fatal: log but still return redirect. Worst case the sweep has nothing to find.
-      console.error("PesaPal initiate: failed to create pending transaction", txn.transactionCreate.errors);
+      // Non-fatal: log (structured, with ids — Vercel log retention is short and
+      // request lines alone can't be correlated) but still return redirect.
+      // Worst case the sweep has nothing to find; completion falls back to
+      // creating a CHARGED transaction (verified path, 2026-10-05 live test).
+      console.error("PesaPal initiate: failed to create pending transaction", {
+        checkoutId,
+        trackingId: data.order_tracking_id,
+        errors: txn.transactionCreate.errors,
+      });
     }
 
     return NextResponse.json({
       redirectUrl: data.redirect_url,
       trackingId: data.order_tracking_id,
+      // Forward-compatible observability: today's UI ignores this; a future
+      // checkout banner can surface it without an API change.
+      pendingWarning:
+        txn.transactionCreate.errors.length > 0
+          ? `Pending payment record not created (${txn.transactionCreate.errors[0]?.message ?? "unknown error"}) — payment can still complete; reconciliation will pick it up.`
+          : null,
     });
   } catch (err) {
     console.error("PesaPal initiate failed:", err);
