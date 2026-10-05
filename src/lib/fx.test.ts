@@ -86,6 +86,22 @@ describe("getUsdToKesRate", () => {
     expect(await getUsdToKesRate()).toBe(131.5);
   });
 
+  it("falls through to the next feed when the first fails", async () => {
+    vi.stubEnv("USD_KES_RATE", "");
+    mockRead.mockImplementation(() => {
+      throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockRejectedValueOnce(new Error("feed one down"))
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ rates: { KES: 129.5 } }) })
+    );
+    expect(await getUsdToKesRate()).toBe(129.5);
+    expect(mockWrite).toHaveBeenCalled();
+  });
+
   it("throws when no env, no cache, fetch fails", async () => {
     vi.stubEnv("USD_KES_RATE", "");
     mockRead.mockImplementation(() => {
