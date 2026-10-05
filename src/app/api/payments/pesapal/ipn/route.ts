@@ -156,7 +156,15 @@ export async function completePesapalPayment(
   // Send the Resend confirmation synchronously. Only reached when checkoutComplete
   // yields a fresh order, so IPN / return-status / reconcile races send exactly one
   // email. `checkout` was captured above, before completion consumed it. Never throws.
-  await sendCheckoutConfirmation(checkout, order.number);
+  // Paid context: this money was taken online via M-Pesa — the email must show the
+  // green paid block, never pay-on-collection (live-test finding 2026-10-05).
+  await sendCheckoutConfirmation(checkout, order.number, {
+    paid: {
+      amount: checkout.totalPrice.gross.amount,
+      currency: checkout.totalPrice.gross.currency,
+      method: "M-Pesa",
+    },
+  });
 
   return { orderId: order.id, orderNumber: order.number };
 }

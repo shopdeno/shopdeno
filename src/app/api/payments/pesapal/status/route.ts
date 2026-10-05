@@ -20,7 +20,18 @@ export async function GET(request: Request) {
     const status = await getPesapalStatus(trackingId);
 
     if (status.payment_status_description === "Completed") {
-      const result = await completePesapalPayment(checkoutId, trackingId);
+      let result;
+      try {
+        result = await completePesapalPayment(checkoutId, trackingId);
+      } catch (err) {
+        // PesaPal itself confirmed Completed, but the Saleor follow-up threw
+        // (seen live 2026-10-05: querying a just-consumed checkout can fail with
+        // a permissions error on the app token). The money is verified — confirm
+        // the payment rather than showing "Payment Issue". IPN/reconcile own the
+        // order record; `recovered` tells the return page the order number is unknown.
+        console.error("PesaPal status: PSP-verified but Saleor follow-up threw:", err);
+        return NextResponse.json({ confirmed: true, recovered: true });
+      }
 
       if (result.error) {
         return NextResponse.json({ error: result.error }, { status: 400 });

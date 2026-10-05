@@ -28,6 +28,13 @@ export type OrderEmailParams = {
   /** "pickup" = collect at studio, "ship" = delivered to address. */
   delivery: "pickup" | "ship";
   deliveryName?: string | null;
+  /**
+   * Set when money was already taken online (PesaPal M-Pesa/card). Pickup
+   * orders WITHOUT this render the amber "Payment due on collection" block;
+   * with it they render a green "Paid" block instead. Never show a
+   * pay-on-collection notice for a prepaid order (live-test finding 2026-10-05).
+   */
+  paid?: { amount: number; currency: string; method: string } | null;
 };
 
 // Resend sends only from a verified domain. The verified domain is the root
@@ -63,6 +70,18 @@ export function renderOrderEmailHtml(p: OrderEmailParams): string {
     )
     .join("");
 
+  const paymentBlock = p.paid
+    ? `<p style="margin:12px 0 0;padding:10px 12px;background:#e8f5e9;border-radius:6px;color:#111">
+         <strong>Paid in full: ${money(p.paid.amount, p.paid.currency)}</strong><br>
+         <span style="color:#555;font-size:13px">Paid online via ${escapeHtml(p.paid.method)} — nothing due on collection.</span>
+       </p>`
+    : p.delivery === "pickup"
+      ? `<p style="margin:12px 0 0;padding:10px 12px;background:#fff8e1;border-radius:6px;color:#111">
+           <strong>Payment due on collection: ${money(p.total.amount, p.total.currency)}</strong><br>
+           <span style="color:#555;font-size:13px">No payment has been taken yet — pay in person when you collect your print.</span>
+         </p>`
+      : "";
+
   const deliveryBlock =
     p.delivery === "pickup"
       ? `<p style="margin:16px 0 4px"><strong>Ready for studio collection</strong></p>
@@ -72,10 +91,7 @@ export function renderOrderEmailHtml(p: OrderEmailParams): string {
            <strong>Before you visit:</strong> call <a href="tel:${siteConfig.contact.phone}" style="color:#111">${escapeHtml(siteConfig.contact.phoneDisplay)}</a> to arrange a convenient collection time.<br>
            <strong>Please bring:</strong> your order number (#${escapeHtml(p.orderNumber)}) and a photo ID.
          </p>
-         <p style="margin:12px 0 0;padding:10px 12px;background:#fff8e1;border-radius:6px;color:#111">
-           <strong>Payment due on collection: ${money(p.total.amount, p.total.currency)}</strong><br>
-           <span style="color:#555;font-size:13px">No payment has been taken yet — pay in person when you collect your print.</span>
-         </p>`
+         ${paymentBlock}`
       : `<p style="margin:16px 0 4px"><strong>What happens next</strong></p>
          <p style="margin:0;color:#555">
            We'll pack and dispatch your order${p.deliveryName ? ` via <strong>${escapeHtml(p.deliveryName)}</strong>` : ""}, usually within 1–2 business days.
@@ -166,13 +182,15 @@ export type CheckoutConfirmationData = {
 
 /**
  * Builds and sends the order confirmation from a Saleor checkout summary. Shared by
- * the studio-pickup completion route and the PesaPal completion path so both order
- * types get an identical email. Never throws — logs and swallows failures so a mail
- * problem can never roll back or 500 a successfully created order.
+ * the studio-pickup completion route (unpaid → pay-on-collection block) and the
+ * PesaPal completion path (pass `opts.paid` → green paid block). Never throws —
+ * logs and swallows failures so a mail problem can never roll back or 500
+ * a successfully created order.
  */
 export async function sendCheckoutConfirmation(
   checkout: CheckoutConfirmationData,
-  orderNumber: string
+  orderNumber: string,
+  opts?: { paid?: { amount: number; currency: string; method: string } | null }
 ): Promise<void> {
   if (!checkout.email) {
     console.warn(`Order ${orderNumber}: no email on checkout, skipping confirmation.`);
@@ -202,6 +220,7 @@ export async function sendCheckoutConfirmation(
     total: checkout.totalPrice.gross,
     delivery: isPickup ? "pickup" : "ship",
     deliveryName: checkout.deliveryMethod?.name ?? null,
+    paid: opts?.paid ?? null,
   });
   if (!result.ok) {
     console.error(`Order ${orderNumber}: confirmation email failed — ${result.error}`);
