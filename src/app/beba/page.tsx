@@ -1,38 +1,73 @@
 import { Metadata } from "next";
 import { getSaleorClient, getChannel } from "@/lib/saleor";
-import { PRODUCTS_QUERY } from "@/graphql/queries";
+import { PRODUCTS_QUERY, CATEGORY_DETAIL_QUERY } from "@/graphql/queries";
 import { toProductOrder } from "@/lib/product-sort";
 import { ProductCard, type ProductCardProduct } from "@/components/ProductCard";
 import { SortSelect } from "@/components/SortSelect";
 import { siteConfig } from "@/lib/site-config";
-import { CATEGORY_DETAIL_QUERY } from "@/graphql/queries";
+import {
+  loadCatalogSnapshot,
+  sortSnapshot,
+  toCardProduct,
+  type SnapshotLight,
+} from "@/lib/catalog-snapshot";
+import { LIVE_TIMEOUT_MS } from "@/lib/live-timeout";
 
 export const metadata: Metadata = {
   title: `Shop BEBA | ${siteConfig.name}`,
   description: "Beba Bei matatu art prints by Dennis Muraguri.",
 };
 
+// Hourly ISR + the public/catalog snapshot fallback keep this page populated
+// even when the free-tier Saleor API is asleep (cold start ~60s).
+export const revalidate = 3600;
+
 export default async function BebaPage({
   searchParams,
 }: {
   searchParams: Promise<{ sort?: string }>;
 }) {
-  const { sort } = await searchParams;
+  const { sort = "NAME" } = await searchParams;
   const client = getSaleorClient();
   const channel = getChannel();
 
-  const catResult = await client.query(CATEGORY_DETAIL_QUERY, { slug: "beba" });
-  const category = catResult.data?.category;
-
   let products: { node: ProductCardProduct }[] = [];
-  if (category) {
-    const result = await client.query(PRODUCTS_QUERY, {
-      channel,
-      first: 100,
-      filter: { categories: [category.id] },
-      sortBy: toProductOrder(sort, channel),
-    });
+  let fromSnapshot = false;
+
+  try {
+    const catResult = await Promise.race([
+      client.query(CATEGORY_DETAIL_QUERY, { slug: "beba" }).toPromise(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`category query timed out after ${LIVE_TIMEOUT_MS}ms`)), LIVE_TIMEOUT_MS),
+      ),
+    ]);
+    if (catResult.error) throw catResult.error;
+    const category = catResult.data?.category;
+    if (!category) throw new Error("beba category not found");
+
+    const result = await Promise.race([
+      client
+        .query(PRODUCTS_QUERY, {
+          channel,
+          first: 100,
+          filter: { categories: [category.id] },
+          sortBy: toProductOrder(sort, channel),
+        })
+        .toPromise(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`products query timed out after ${LIVE_TIMEOUT_MS}ms`)), LIVE_TIMEOUT_MS),
+      ),
+    ]);
+    if (result.error) throw result.error;
     products = result.data?.products?.edges || [];
+  } catch (error) {
+    console.error("Live BEBA query failed, falling back to snapshot:", error);
+    const snap: SnapshotLight[] | null = loadCatalogSnapshot();
+    if (snap) {
+      const beba = snap.filter((p) => p.categorySlug?.includes("beba"));
+      products = sortSnapshot(beba, sort).map((p) => ({ node: toCardProduct(p) }));
+      fromSnapshot = true;
+    }
   }
 
   return (
@@ -50,8 +85,11 @@ export default async function BebaPage({
         ) : (
           <>
             <div className="mt-10 flex items-center justify-between">
-              <p className="text-sm text-gray-500">{products.length} print{products.length !== 1 ? "s" : ""}</p>
-              <SortSelect current={sort ?? ""} />
+              <p className="text-sm text-gray-500" data-catalog-source={fromSnapshot ? "snapshot" : "live"}>
+                {products.length} print{products.length !== 1 ? "s" : ""}
+                {fromSnapshot && " · cached view — verifying live prices…"}
+              </p>
+              <SortSelect current={sort} />
             </div>
             <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4 xl:gap-x-8">
               {products.map(({ node }) => (
