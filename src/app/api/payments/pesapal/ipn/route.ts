@@ -90,7 +90,8 @@ type CheckoutCompleteResult = {
 
 export async function completePesapalPayment(
   checkoutId: string,
-  orderTrackingId: string
+  orderTrackingId: string,
+  paymentMethod?: string
 ): Promise<{ orderId?: string; orderNumber?: string; alreadyDone?: boolean; error?: string }> {
   const { checkout } = await saleorAdmin<CheckoutTransactionsResult>(
     CHECKOUT_TRANSACTIONS_QUERY,
@@ -156,13 +157,15 @@ export async function completePesapalPayment(
   // Send the Resend confirmation synchronously. Only reached when checkoutComplete
   // yields a fresh order, so IPN / return-status / reconcile races send exactly one
   // email. `checkout` was captured above, before completion consumed it. Never throws.
-  // Paid context: this money was taken online via M-Pesa — the email must show the
-  // green paid block, never pay-on-collection (live-test finding 2026-10-05).
+  // Paid context: this money was taken online — the email must show the green
+  // paid block, never pay-on-collection (live-test finding 2026-10-05). Method
+  // comes from PesaPal's status (MPESA/VISA/…); normalized for display.
+  const method = /^m-?pesa$/i.test(paymentMethod ?? "") ? "M-Pesa" : (paymentMethod || "M-Pesa");
   await sendCheckoutConfirmation(checkout, order.number, {
     paid: {
       amount: checkout.totalPrice.gross.amount,
       currency: checkout.totalPrice.gross.currency,
-      method: "M-Pesa",
+      method,
     },
   });
 
@@ -183,7 +186,7 @@ export async function GET(request: Request) {
     const status = await getPesapalStatus(orderTrackingId);
 
     if (status.payment_status_description === "Completed") {
-      await completePesapalPayment(checkoutId, orderTrackingId);
+      await completePesapalPayment(checkoutId, orderTrackingId, status.payment_method);
     } else {
       console.log(`PesaPal IPN: status ${status.payment_status_description} for ${orderTrackingId}`);
     }

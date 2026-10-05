@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     if (status.payment_status_description === "Completed") {
       let result;
       try {
-        result = await completePesapalPayment(checkoutId, trackingId);
+        result = await completePesapalPayment(checkoutId, trackingId, status.payment_method);
       } catch (err) {
         // PesaPal itself confirmed Completed, but the Saleor follow-up threw
         // (seen live 2026-10-05: querying a just-consumed checkout can fail with

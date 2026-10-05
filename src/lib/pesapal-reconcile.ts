@@ -49,7 +49,7 @@ export type PendingCheckout = { checkoutId: string; trackingId: string };
 export type ReconcileDeps = {
   getPendingCheckouts: () => Promise<PendingCheckout[]>;
   getStatus: (trackingId: string) => Promise<PesapalOrderStatus>;
-  complete: (checkoutId: string, trackingId: string) => Promise<{
+  complete: (checkoutId: string, trackingId: string, paymentMethod?: string) => Promise<{
     orderId?: string;
     orderNumber?: string;
     alreadyDone?: boolean;
@@ -73,7 +73,7 @@ export async function reconcilePesapalOrders(deps: ReconcileDeps): Promise<Recon
         continue;
       }
 
-      const completion = await deps.complete(checkoutId, trackingId);
+      const completion = await deps.complete(checkoutId, trackingId, status.payment_method);
       if (completion.error) {
         console.error(`Reconcile: checkout ${checkoutId} completion failed — ${completion.error}`);
         result.errors++;

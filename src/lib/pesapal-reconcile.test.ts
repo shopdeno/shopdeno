@@ -36,7 +36,22 @@ describe("reconcilePesapalOrders", () => {
       complete,
     });
     expect(result).toEqual({ completed: 1, skipped: 0, errors: 0 });
-    expect(complete).toHaveBeenCalledWith("c1", "t1");
+    expect(complete).toHaveBeenCalledWith("c1", "t1", undefined);
+  });
+
+  it("threads the PSP payment method through to completion", async () => {
+    const complete = vi.fn(successComplete);
+    const result = await reconcilePesapalOrders({
+      getPendingCheckouts: async () => [{ checkoutId: "c1", trackingId: "t1" }],
+      getStatus: () =>
+        Promise.resolve({
+          payment_status_description: "Completed",
+          payment_method: "VISA",
+        } as Awaited<ReturnType<ReconcileDeps["getStatus"]>>),
+      complete,
+    });
+    expect(result).toEqual({ completed: 1, skipped: 0, errors: 0 });
+    expect(complete).toHaveBeenCalledWith("c1", "t1", "VISA");
   });
 
   it("counts alreadyDone as completed — idempotent", async () => {
