@@ -1,7 +1,10 @@
-# Render Blueprint: two free services (Frankfurt) sharing the 750h/month pool.
-# Both sleep when idle, so low-traffic usage stays inside the free quota.
+# Render Blueprint: one free web service (Frankfurt) on the 750h/month pool.
+# Sleeps when idle, so low-traffic usage stays inside the free quota.
 # DB = Neon, cache/broker = Upstash, media = Supabase Storage.
 # Secrets use `sync: false` so Render prompts for values in the dashboard.
+# The Celery worker was retired 2026-10-05: order emails go via Resend
+# (storefront /api/checkout/complete), thumbnails via the Supabase render
+# transform, and no scheduled Saleor tasks are in use.
 services:
   - type: web
     name: shopdeno-saleor-api
@@ -25,7 +28,7 @@ services:
       - key: ALLOWED_HOSTS
         sync: false
       - key: ALLOWED_CLIENT_HOSTS
-        value: shop.dennis-muraguri.co.ke,my-catalyst-next.vercel.app
+        value: shop.dennis-muraguri.co.ke,my-catalyst-next.vercel.app,shopdeno-saleor-dashboard.vercel.app
       - key: DEFAULT_CHANNEL_SLUG
         value: default-channel
       - key: AWS_ACCESS_KEY_ID
@@ -46,55 +49,6 @@ services:
         value: 587
       - key: EMAIL_HOST_USER
         sync: false
-      - key: EMAIL_HOST_PASSWORD
-        sync: false
-      - key: DEFAULT_FROM_EMAIL
-        value: sales@shop.dennis-muraguri.co.ke
-  - type: web
-    name: shopdeno-saleor-worker
-    runtime: docker
-    repo: https://github.com/shopdeno/shopdeno
-    branch: main
-    region: frankfurt
-    plan: free
-    dockerfilePath: ./hosting/Dockerfile
-    dockerContext: ./hosting
-    healthCheckPath: /
-    envVars:
-      - key: MODE
-        value: worker
-      - key: SECRET_KEY
-        sync: false
-      - key: DEBUG
-        value: "false"
-      # Required by saleor/settings.py when DEBUG=False (raises ImproperlyConfigured
-      # at import otherwise → worker crash-loops). Mirrors the api service above.
-      - key: ALLOWED_CLIENT_HOSTS
-        value: shop.dennis-muraguri.co.ke,my-catalyst-next.vercel.app
-      - key: DATABASE_URL
-        sync: false
-      - key: REDIS_URL
-        sync: false
-      - key: DEFAULT_CHANNEL_SLUG
-        value: default-channel
-      - key: AWS_ACCESS_KEY_ID
-        sync: false
-      - key: AWS_SECRET_ACCESS_KEY
-        sync: false
-      - key: AWS_MEDIA_BUCKET_NAME
-        value: saleor-media
-      - key: AWS_S3_ENDPOINT_URL
-        value: https://sqjpzfydzfshibhiixim.supabase.co/storage/v1/s3
-      - key: AWS_S3_REGION_NAME
-        value: eu-west-1
-      - key: AWS_MEDIA_CUSTOM_DOMAIN
-        value: sqjpzfydzfshibhiixim.supabase.co/storage/v1/object/public/saleor-media
-      - key: EMAIL_HOST
-        value: smtp.resend.com
-      - key: EMAIL_PORT
-        value: 587
-      - key: EMAIL_HOST_USER
-        value: resend
       - key: EMAIL_HOST_PASSWORD
         sync: false
       - key: DEFAULT_FROM_EMAIL
