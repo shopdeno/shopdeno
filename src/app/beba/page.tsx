@@ -87,7 +87,7 @@ export default async function BebaPage({
             <div className="mt-10 flex items-center justify-between">
               <p className="text-sm text-gray-500" data-catalog-source={fromSnapshot ? "snapshot" : "live"}>
                 {products.length} print{products.length !== 1 ? "s" : ""}
-                {fromSnapshot && " · cached view — verifying live prices…"}
+                {fromSnapshot && " · saved view"}
               </p>
               <SortSelect current={sort} />
             </div>

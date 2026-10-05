@@ -360,8 +360,8 @@ export function ProductDetailClient({ product, relatedProducts = [], snapshotNot
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         {verifying && (
-          <p className="mb-4 rounded-lg bg-amber-50 px-4 py-2 text-sm text-amber-800" data-catalog-source="snapshot">
-            Cached view — verifying live availability…
+          <p className="mb-4 rounded-lg bg-gray-50 px-4 py-2 text-sm text-gray-500" data-catalog-source="snapshot">
+            Showing saved details — final price confirmed at checkout.
           </p>
         )}
         {/* Breadcrumb */}

@@ -111,7 +111,7 @@ export default async function ProductsPage({
             <div className="mt-10 flex items-center justify-between">
               <p className="text-sm text-gray-500" data-catalog-source={fromSnapshot ? "snapshot" : "live"}>
                 {products.length} prints
-                {fromSnapshot && " · cached view — verifying live prices…"}
+                {fromSnapshot && " · saved view"}
               </p>
               <SortSelect current={sort} />
             </div>
